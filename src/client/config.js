@@ -1,5 +1,5 @@
 /**
- * @namespace Client.Redis
+ * @namespace Redis.Client
  */
 module.exports =
 {

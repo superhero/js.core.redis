@@ -1,7 +1,7 @@
 /**
- * @memberof Client.Redis
+ * @memberof Redis.Client
  */
-class Redis
+class RedisClient
 {
   constructor(gateway, factory, key, hash, pubsub, stream, transaction)
   {
@@ -34,4 +34,4 @@ class Redis
   }
 }
 
-module.exports = Redis
+module.exports = RedisClient

@@ -1,7 +1,7 @@
 const
   redis               = require('redis'),
   Events              = require('events'),
-  Redis               = require('.'),
+  RedisClient         = require('.'),
   RedisKey            = require('./service/key'),
   RedisHash           = require('./service/hash'),
   RedisPubsub         = require('./service/pubsub'),
@@ -10,13 +10,13 @@ const
   LocatorConstituent  = require('superhero/core/locator/constituent')
 
 /**
- * @memberof Client.Redis
+ * @memberof Redis.Client
  * @extends {superhero/core/locator/constituent}
  */
-class RedisLocator extends LocatorConstituent
+class RedisClientLocator extends LocatorConstituent
 {
   /**
-   * @returns {Redis}
+   * @returns {RedisClient}
    */
   locate()
   {
@@ -33,8 +33,8 @@ class RedisLocator extends LocatorConstituent
       factory       = this.locate.bind(this),
       transaction   = new RedisTransaction(client)
 
-    return new Redis(client, factory, key, hash, pubsub, stream, transaction)
+    return new RedisClient(client, factory, key, hash, pubsub, stream, transaction)
   }
 }
 
-module.exports = RedisLocator
+module.exports = RedisClientLocator

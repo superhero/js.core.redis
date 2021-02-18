@@ -1,5 +1,5 @@
 /**
- * @memberof Client.Redis
+ * @memberof Redis.Client
  */
 class RedisServiceHash
 {

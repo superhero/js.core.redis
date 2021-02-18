@@ -1,5 +1,5 @@
 /**
- * @namespace Eventsource.Test
+ * @namespace Redis.Test
  */
 module.exports =
 {
