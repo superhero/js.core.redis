@@ -21,8 +21,8 @@ class RedisLocator extends LocatorConstituent
   locate()
   {
     const
-      configuration = this.locator.locate('core/configuration'),
       console       = this.locator.locate('core/console'),
+      configuration = this.locator.locate('core/configuration'),
       options       = configuration.find('client/redis/gateway'),
       client        = redis.createClient(options),
       eventbus      = new Events(),

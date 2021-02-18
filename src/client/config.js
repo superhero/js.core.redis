@@ -10,7 +10,7 @@ module.exports =
       'client/redis' : __dirname
     }
   },
-  infrastructure:
+  client:
   {
     redis:
     {
