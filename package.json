@@ -1,0 +1,34 @@
+{
+  "name": "@superhero/eventsource",
+  "version": "0.1.0",
+  "description": "A solution for an eventsource implementation, working with mysql for persistence and redis for comunication",
+  "repository": "git@github.com:superhero/js.eventsource.git",
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+    "docs-coverage": "nyc mocha && nyc report --reporter=html --report-dir=./docs/generated/coverage",
+    "docs-tests": "mocha --reporter mochawesome --reporter-options reportDir=docs/generated/test,reportFilename=index,showHooks=always",
+    "test": "mocha"
+  },
+  "dependencies": {
+    "redis": "3.0.2"
+  },
+  "devDependencies": {
+    "superhero": "2.1.8",
+    "chai": "4.2.0",
+    "mocha": "6.2.1",
+    "mochawesome": "4.1.0",
+    "nyc": "14.1.1"
+  },
+  "mocha": {
+    "require": [
+      "./src/test/init.js"
+    ],
+    "ui": "bdd",
+    "full-trace": true,
+    "timeout": 5000,
+    "spec": [
+      "./src/test/**/*.test.js"
+    ]
+  }
+}
