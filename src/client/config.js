@@ -7,7 +7,7 @@ module.exports =
   {
     locator:
     {
-      'client/redis' : __dirname
+      'redis/client' : __dirname
     }
   },
   client:
