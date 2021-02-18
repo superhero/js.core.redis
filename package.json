@@ -1,8 +1,8 @@
 {
-  "name": "@superhero/eventsource",
+  "name": "@superhero/core.redis",
   "version": "0.1.0",
-  "description": "A solution for an eventsource implementation, working with mysql for persistence and redis for comunication",
-  "repository": "git@github.com:superhero/js.eventsource.git",
+  "description": "A redis wrapper for the core library",
+  "repository": "git@github.com:superhero/js.core.redis.git",
   "license": "MIT",
   "main": "index.js",
   "scripts": {
