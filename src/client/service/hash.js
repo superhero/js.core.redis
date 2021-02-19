@@ -33,7 +33,7 @@ class RedisServiceHash
   {
     return new Promise((accept, reject) =>
     {
-      this.gateway.hget(key, field, (previousError, result) =>
+      this.gateway.hget(key, field, (previousError, response) =>
       {
         if(previousError)
         {
@@ -43,9 +43,18 @@ class RedisServiceHash
           reject(error)
         }
 
-        const decoded = JSON.parse(result)
-
-        accept(decoded)
+        try
+        {
+          const decoded = JSON.parse(response)
+          accept(decoded)
+        }
+        catch(previousError)
+        {
+          const error = new Error('read hash error occured when decoding the response')
+          error.code  = 'E_REDIS_HASH_READ'
+          error.chain = { previousError, key, response }
+          reject(error)
+        }
       })
     })
   }

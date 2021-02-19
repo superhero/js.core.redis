@@ -43,9 +43,18 @@ class RedisServiceKey
           reject(error)
         }
 
-        const decoded = JSON.parse(response)
-
-        accept(decoded)
+        try
+        {
+          const decoded = JSON.parse(response)
+          accept(decoded)
+        }
+        catch(previousError)
+        {
+          const error = new Error('get key failed when decoding the response')
+          error.code  = 'E_REDIS_KEY_READ'
+          error.chain = { previousError, key, response }
+          reject(error)
+        }
       })
     })
   }
