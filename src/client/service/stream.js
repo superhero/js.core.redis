@@ -79,7 +79,7 @@ class RedisServiceStream
 
           try
           {
-            consumer && await consumer(msg)
+            consumer && await consumer(id, msg)
             this.gateway.xack(stream, group, id)
             accept(msg)
           }
