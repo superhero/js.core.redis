@@ -40,7 +40,7 @@ class RedisServicePubsub
     this.eventbus.on(channel, observer)
   }
 
-  publish(channel, msg)
+  publish(channel, msg = null)
   {
     const encoded = JSON.stringify(msg)
     this.gateway.publish(channel, encoded)
