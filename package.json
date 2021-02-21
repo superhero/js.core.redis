@@ -1,6 +1,6 @@
 {
   "name": "@superhero/core.redis",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A redis wrapper for the core library",
   "repository": "git@github.com:superhero/js.core.redis.git",
   "license": "MIT",
@@ -14,11 +14,11 @@
     "redis": "3.0.2"
   },
   "devDependencies": {
-    "superhero": "2.1.8",
     "chai": "4.2.0",
     "mocha": "6.2.1",
     "mochawesome": "4.1.0",
-    "nyc": "14.1.1"
+    "nyc": "14.1.1",
+    "superhero": "2.1.8"
   },
   "mocha": {
     "require": [

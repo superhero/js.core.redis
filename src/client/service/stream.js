@@ -66,15 +66,25 @@ class RedisServiceStream
             dto = result[0][1][0][1],
             msg = {}
 
-          // TODO move to mapper
-          // mapping dto from a csv array to a json object
-          for(let i = 1; i < dto.length; i += 2)
+          try
           {
-            const
-              key = dto[i-1],
-              val = JSON.parse(dto[i])
-
-            msg[key] = val
+            // TODO move to mapper
+            // mapping dto from a csv array to a json object
+            for(let i = 1; i < dto.length; i += 2)
+            {
+              const
+                key = dto[i-1],
+                val = JSON.parse(dto[i])
+  
+              msg[key] = val
+            }
+          }
+          catch(previousError)
+          {
+            const error = new Error('read from redis stream - mapping failed')
+            error.code  = 'E_REDIS_STREAM_READ_MAPPER'
+            error.chain = { previousError, stream, group, id }
+            reject(error)
           }
 
           try
@@ -85,9 +95,9 @@ class RedisServiceStream
           }
           catch(previousError)
           {
-            const error = new Error('consumer failed')
+            const error = new Error('read from redis stream - consumer failed')
             error.code  = 'E_REDIS_STREAM_READ_CONSUMER'
-            error.chain = { previousError, stream, group, id, msg }
+            error.chain = { previousError, stream, group, id }
             reject(error)
           }
         }

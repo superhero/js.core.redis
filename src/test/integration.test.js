@@ -24,7 +24,7 @@ describe('Redis client test suit', () =>
 
   after(() =>
   {
-    core.locate('client/redis').quit()
+    core.locate('redis/client').quit()
   })
 
   describe('Redis service hash', () =>
@@ -37,7 +37,7 @@ describe('Redis client test suit', () =>
     it('can write a hash', async function()
     {
       const
-        client = core.locate('client/redis'),
+        client = core.locate('redis/client'),
         result = await client.hash.write(key, field, value)
   
       context(this, { title:'context', value:{ key, field, value, result }})
@@ -47,7 +47,7 @@ describe('Redis client test suit', () =>
     it('can read a hash', async function()
     {
       const
-        client = core.locate('client/redis'),
+        client = core.locate('redis/client'),
         result = await client.hash.read(key, field)
   
       context(this, { title:'context', value:{ key, field, value, result }})
@@ -57,7 +57,7 @@ describe('Redis client test suit', () =>
     it('can delete a hash', async function()
     {
       const
-        client = core.locate('client/redis'),
+        client = core.locate('redis/client'),
         result = await client.hash.delete(key, field)
   
       context(this, { title:'context', value:{ key, field, result }})
@@ -74,7 +74,7 @@ describe('Redis client test suit', () =>
     it('can write a key', async function()
     {
       const
-        client = core.locate('client/redis'),
+        client = core.locate('redis/client'),
         result = await client.key.write(key, value)
   
       context(this, { title:'context', value:{ key, value, result }})
@@ -84,7 +84,7 @@ describe('Redis client test suit', () =>
     it('can read a key', async function()
     {
       const
-        client = core.locate('client/redis'),
+        client = core.locate('redis/client'),
         result = await client.key.read(key)
   
       context(this, { title:'context', value:{ key, value, result }})
@@ -94,7 +94,7 @@ describe('Redis client test suit', () =>
     it('can delete a key', async function()
     {
       const
-        client = core.locate('client/redis'),
+        client = core.locate('redis/client'),
         result = await client.key.delete(key)
   
       context(this, { title:'context', value:{ key, result }})
@@ -111,7 +111,7 @@ describe('Redis client test suit', () =>
     it('can publish and subscribe to a channel', function(done)
     {
       const
-        client      = core.locate('client/redis'),
+        client      = core.locate('redis/client'),
         subscriber  = client.createSession()
       
       context(this, { title:'context', value:{ channel, msg }})
@@ -134,7 +134,7 @@ describe('Redis client test suit', () =>
     it('can lazyload consumer group', async function()
     {
       const
-        client = core.locate('client/redis'),
+        client = core.locate('redis/client'),
         result = await client.stream.lazyloadConsumerGroup(channel, channel)
   
       context(this, { title:'context', value:{ channel, msg, result }})
@@ -144,7 +144,7 @@ describe('Redis client test suit', () =>
     it('can write to a stream', async function()
     {
       const
-        client = core.locate('client/redis'),
+        client = core.locate('redis/client'),
         result = await client.stream.write(channel, msg)
   
       context(this, { title:'context', value:{ channel, msg, result }})
@@ -155,7 +155,7 @@ describe('Redis client test suit', () =>
     it('can read a stream', async function()
     {
       const
-        client = core.locate('client/redis'),
+        client = core.locate('redis/client'),
         result = await client.stream.read(channel, channel)
   
       context(this, { title:'context', value:{ channel, msg, result }})
@@ -172,7 +172,7 @@ describe('Redis client test suit', () =>
     it('can make a simple transaction', async function()
     {
       const
-        client      = core.locate('client/redis'),
+        client      = core.locate('redis/client'),
         session     = client.createSession(),
         multiResult = await session.transaction.multi(),
         writeResult = await session.key.write(key, value),
@@ -187,7 +187,7 @@ describe('Redis client test suit', () =>
     it('can make a simple transaction with "watch"', async function()
     {
       const
-        client      = core.locate('client/redis'),
+        client      = core.locate('redis/client'),
         session     = client.createSession(),
         watchResult = await session.transaction.watch(key),
         multiResult = await session.transaction.multi(),
