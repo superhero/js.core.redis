@@ -68,7 +68,7 @@ describe('Redis client test suit', () =>
   describe('Redis service key', () =>
   {
     const
-      key   = 'test-key', 
+      key   = 'test-key',
       value = { test:'value' }
 
     it('can write a key', async function()
@@ -99,6 +99,43 @@ describe('Redis client test suit', () =>
   
       context(this, { title:'context', value:{ key, result }})
       expect(result).to.equal(1)
+    })
+  })
+
+  describe('Redis service list', () =>
+  {
+    const
+      key   = 'test-list-key',
+      value = { test:'value' }
+
+    it('can push to a list', async function()
+    {
+      const
+        client = core.locate('redis/client'),
+        result = await client.list.lpush(key, value)
+  
+      context(this, { title:'context', value:{ key, value, result }})
+      expect(result).to.equal(1)
+    })
+  
+    it('can fetch the full range from a list', async function()
+    {
+      const
+        client = core.locate('redis/client'),
+        result = await client.list.range(key, 0, 0)
+  
+      context(this, { title:'context', value:{ key, value, result }})
+      expect(result).to.deep.equal([ value ])
+    })
+  
+    it('can pop from a list', async function()
+    {
+      const
+        client = core.locate('redis/client'),
+        result = await client.list.rpop(key)
+  
+      context(this, { title:'context', value:{ key, value, result }})
+      expect(result).to.deep.equal(value)
     })
   })
 
