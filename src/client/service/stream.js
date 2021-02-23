@@ -32,7 +32,6 @@ class RedisServiceStream
           const error = new Error('stream error occured')
           error.code  = 'E_REDIS_STREAM_WRITE'
           error.chain = { previousError, stream, msg, dto }
-
           reject(error)
         }
 
@@ -41,18 +40,17 @@ class RedisServiceStream
     })
   }
 
-  read(stream, group, consumer)
+  readGroup(stream, group, consumer)
   {
     return new Promise((accept, reject) =>
     {
-      this.gateway.xreadgroup('GROUP', group, 'consumer', 'STREAMS', stream, '>', async (previousError, result) =>
+      this.gateway.xreadgroup('GROUP', group, 'consumer', 'COUNT', 1, 'STREAMS', stream, '>', async (previousError, result) =>
       {
         if(previousError)
         {
           const error = new Error('stream error occured')
-          error.code  = 'E_REDIS_STREAM_READ_GATEWAY'
-          error.chain = { previousError, group }
-          this.console.log(error)
+          error.code  = 'E_REDIS_STREAM_READ_GROUP_GATEWAY'
+          error.chain = { previousError, stream, group }
           reject(error)
         }
         else if(result === null)
@@ -81,8 +79,8 @@ class RedisServiceStream
           }
           catch(previousError)
           {
-            const error = new Error('read from redis stream - mapping failed')
-            error.code  = 'E_REDIS_STREAM_READ_MAPPER'
+            const error = new Error('read from group - mapping failed')
+            error.code  = 'E_REDIS_STREAM_READ_GROUP_MAPPER'
             error.chain = { previousError, stream, group, id }
             reject(error)
           }
@@ -95,11 +93,61 @@ class RedisServiceStream
           }
           catch(previousError)
           {
-            const error = new Error('read from redis stream - consumer failed')
-            error.code  = 'E_REDIS_STREAM_READ_CONSUMER'
+            const error = new Error('read from group - consumer failed')
+            error.code  = 'E_REDIS_STREAM_READ_GROUP_CONSUMER'
             error.chain = { previousError, stream, group, id }
             reject(error)
           }
+        }
+      })
+    })
+  }
+
+  read(stream, id)
+  {
+    return new Promise((accept, reject) =>
+    {
+      this.gateway.xread('COUNT', 1, 'STREAMS', stream, id, async (previousError, result) =>
+      {
+        if(previousError)
+        {
+          const error = new Error('stream error occured')
+          error.code  = 'E_REDIS_STREAM_READ_GATEWAY'
+          error.chain = { previousError, stream, id }
+          reject(error)
+        }
+        else if(result === null)
+        {
+          accept(result)
+        }
+        else
+        {
+          const
+            dto = result[0][1][0][1],
+            msg = {}
+
+          try
+          {
+            // TODO move to mapper
+            // mapping dto from a csv array to a json object
+            for(let i = 1; i < dto.length; i += 2)
+            {
+              const
+                key = dto[i-1],
+                val = JSON.parse(dto[i])
+  
+              msg[key] = val
+            }
+          }
+          catch(previousError)
+          {
+            const error = new Error('read from stream failed')
+            error.code  = 'E_REDIS_STREAM_READ'
+            error.chain = { previousError, stream, id }
+            reject(error)
+          }
+          
+          accept(msg)
         }
       })
     })

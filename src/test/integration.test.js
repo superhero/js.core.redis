@@ -189,14 +189,28 @@ describe('Redis client test suit', () =>
       expect(result).to.not.equal(undefined)
     })
   
-    it('can read a stream', async function()
+    it('can read a stream through a group', async function()
     {
       const
         client = core.locate('redis/client'),
-        result = await client.stream.read(channel, channel)
+        result = await client.stream.readGroup(channel, channel)
   
       context(this, { title:'context', value:{ channel, msg, result }})
       expect(result).to.deep.equal(msg)
+    })
+  
+    it('can read an acknowledged message by a specific id from a stream', function(done)
+    {
+      const client = core.locate('redis/client')
+      client.stream.write(channel, msg)
+      client.stream.readGroup(channel, channel, async (id, resultGroup) => 
+      {
+        const resultStream = await client.stream.read(channel, id)
+        expect(resultGroup).to.deep.equal(msg)
+        expect(resultStream).to.deep.equal(msg)
+        context(this, { title:'context', value:{ channel, msg, resultStream, resultGroup }})
+        done()
+      })
     })
   })
 
