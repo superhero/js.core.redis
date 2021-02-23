@@ -26,8 +26,10 @@ class RedisServiceTransaction
           error.chain = { previousError }
           reject(error)
         }
-
-        accept(response)
+        else
+        {
+          accept(response)
+        }
       })
     })
   }
@@ -54,8 +56,10 @@ class RedisServiceTransaction
           error.chain = { previousError }
           reject(error)
         }
-
-        accept(response)
+        else
+        {
+          accept(response)
+        }
       })
     })
   }
@@ -78,8 +82,10 @@ class RedisServiceTransaction
           error.chain = { previousError }
           reject(error)
         }
-
-        accept(response)
+        else
+        {
+          accept(response)
+        }
       })
     })
   }
@@ -97,8 +103,10 @@ class RedisServiceTransaction
           error.chain = { previousError }
           reject(error)
         }
-
-        accept(response)
+        else
+        {
+          accept(response)
+        }
       })
     })
   }
@@ -116,8 +124,10 @@ class RedisServiceTransaction
           error.chain = { previousError, keys }
           reject(error)
         }
-
-        accept(response)
+        else
+        {
+          accept(response)
+        }
       })
     })
   }

@@ -23,8 +23,10 @@ class RedisServiceKey
           error.chain = { previousError, key, value }
           reject(error)
         }
-
-        accept(response)
+        else
+        {
+          accept(response)
+        }
       })
     })
   }
@@ -42,18 +44,20 @@ class RedisServiceKey
           error.chain = { previousError, key }
           reject(error)
         }
-
-        try
+        else
         {
-          const decoded = JSON.parse(response)
-          accept(decoded)
-        }
-        catch(previousError)
-        {
-          const error = new Error('get key failed when decoding the response')
-          error.code  = 'E_REDIS_KEY_READ'
-          error.chain = { previousError, key, response }
-          reject(error)
+          try
+          {
+            const decoded = JSON.parse(response)
+            accept(decoded)
+          }
+          catch(previousError)
+          {
+            const error = new Error('get key failed when decoding the response')
+            error.code  = 'E_REDIS_KEY_READ'
+            error.chain = { previousError, key, response }
+            reject(error)
+          }
         }
       })
     })
@@ -72,8 +76,10 @@ class RedisServiceKey
           error.chain = { previousError, key }
           reject(error)
         }
-
-        accept(response)
+        else
+        {
+          accept(response)
+        }
       })
     })
   }

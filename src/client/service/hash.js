@@ -23,8 +23,10 @@ class RedisServiceHash
           error.chain = { previousError, key, field, value }
           reject(error)
         }
-
-        accept(response)
+        else
+        {
+          accept(response)
+        }
       })
     })
   }
@@ -42,18 +44,20 @@ class RedisServiceHash
           error.chain = { previousError, key, field }
           reject(error)
         }
-
-        try
+        else
         {
-          const decoded = JSON.parse(response)
-          accept(decoded)
-        }
-        catch(previousError)
-        {
-          const error = new Error('read hash error occured when decoding the response')
-          error.code  = 'E_REDIS_HASH_READ'
-          error.chain = { previousError, key, response }
-          reject(error)
+          try
+          {
+            const decoded = JSON.parse(response)
+            accept(decoded)
+          }
+          catch(previousError)
+          {
+            const error = new Error('read hash error occured when decoding the response')
+            error.code  = 'E_REDIS_HASH_READ'
+            error.chain = { previousError, key, response }
+            reject(error)
+          }
         }
       })
     })
@@ -72,8 +76,10 @@ class RedisServiceHash
           error.chain = { previousError, key, field }
           reject(error)
         }
-
-        accept(response)
+        else
+        {
+          accept(response)
+        }
       })
     })
   }

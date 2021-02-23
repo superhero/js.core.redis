@@ -17,7 +17,6 @@ class RedisServiceList
    */
   range(key, start, stop)
   {
-
     return new Promise((accept, reject) =>
     {
       // list 0 10 will return 11 elements, that is, the rightmost item is included. 
@@ -31,18 +30,20 @@ class RedisServiceList
           error.chain = { previousError, key, start, stop }
           reject(error)
         }
-
-        try
+        else
         {
-          const decoded = response && response.map((item) => JSON.parse(item))
-          accept(decoded)
-        }
-        catch(previousError)
-        {
-          const error = new Error('range list error occured when decoding the response')
-          error.code  = 'E_REDIS_LIST_RANGE'
-          error.chain = { previousError, key, start, stop }
-          reject(error)
+          try
+          {
+            const decoded = response && response.map((item) => JSON.parse(item))
+            accept(decoded)
+          }
+          catch(previousError)
+          {
+            const error = new Error('range list error occured when decoding the response')
+            error.code  = 'E_REDIS_LIST_RANGE'
+            error.chain = { previousError, key, start, stop }
+            reject(error)
+          }
         }
       })
     })
@@ -61,8 +62,10 @@ class RedisServiceList
           error.chain = { previousError, key, start, stop }
           reject(error)
         }
-
-        accept(response)
+        else
+        {
+          accept(response)
+        }
       })
     })
   }
@@ -82,8 +85,10 @@ class RedisServiceList
           error.chain = { previousError, key, value }
           reject(error)
         }
-
-        accept(response)
+        else
+        {
+          accept(response)
+        }
       })
     })
   }
@@ -101,18 +106,20 @@ class RedisServiceList
           error.chain = { previousError, key }
           reject(error)
         }
-
-        try
+        else
         {
-          const decoded = JSON.parse(response)
-          accept(decoded)
-        }
-        catch(previousError)
-        {
-          const error = new Error('left pop list error occured when decoding the response')
-          error.code  = 'E_REDIS_LIST_POP_LEFT'
-          error.chain = { previousError, key, response }
-          reject(error)
+          try
+          {
+            const decoded = JSON.parse(response)
+            accept(decoded)
+          }
+          catch(previousError)
+          {
+            const error = new Error('left pop list error occured when decoding the response')
+            error.code  = 'E_REDIS_LIST_POP_LEFT'
+            error.chain = { previousError, key, response }
+            reject(error)
+          }
         }
       })
     })
@@ -133,8 +140,10 @@ class RedisServiceList
           error.chain = { previousError, key, value }
           reject(error)
         }
-
-        accept(response)
+        else
+        {
+          accept(response)
+        }
       })
     })
   }
@@ -152,18 +161,20 @@ class RedisServiceList
           error.chain = { previousError, key }
           reject(error)
         }
-
-        try
+        else
         {
-          const decoded = JSON.parse(response)
-          accept(decoded)
-        }
-        catch(previousError)
-        {
-          const error = new Error('right pop list error occured when decoding the response')
-          error.code  = 'E_REDIS_LIST_POP_RIGHT'
-          error.chain = { previousError, key, response }
-          reject(error)
+          try
+          {
+            const decoded = JSON.parse(response)
+            accept(decoded)
+          }
+          catch(previousError)
+          {
+            const error = new Error('right pop list error occured when decoding the response')
+            error.code  = 'E_REDIS_LIST_POP_RIGHT'
+            error.chain = { previousError, key, response }
+            reject(error)
+          }
         }
       })
     })

@@ -34,8 +34,10 @@ class RedisServiceStream
           error.chain = { previousError, stream, msg, dto }
           reject(error)
         }
-
-        accept(response)
+        else
+        {
+          accept(response)
+        }
       })
     })
   }
@@ -82,13 +84,13 @@ class RedisServiceStream
             const error = new Error('read from group - mapping failed')
             error.code  = 'E_REDIS_STREAM_READ_GROUP_MAPPER'
             error.chain = { previousError, stream, group, id }
-            reject(error)
+            return reject(error)
           }
 
           try
           {
             consumer && await consumer(id, msg)
-            this.gateway.xack(stream, group, id)
+            await this.ack(stream, group, id)
             accept(msg)
           }
           catch(previousError)
@@ -96,8 +98,29 @@ class RedisServiceStream
             const error = new Error('read from group - consumer failed')
             error.code  = 'E_REDIS_STREAM_READ_GROUP_CONSUMER'
             error.chain = { previousError, stream, group, id }
-            reject(error)
+            return reject(error)
           }
+        }
+      })
+    })
+  }
+
+  ack(stream, group, id)
+  {
+    return new Promise((accept, reject) =>
+    {
+      this.gateway.xack(stream, group, id, (previousError, response) =>
+      {
+        if(previousError)
+        {
+          const error = new Error('failed to acknowledge stream')
+          error.code  = 'E_REDIS_STREAM_READ_GROUP_CONSUMER'
+          error.chain = { previousError, stream, group, id }
+          reject(error)
+        }
+        else
+        {
+          accept(response)
         }
       })
     })
@@ -138,6 +161,7 @@ class RedisServiceStream
   
               msg[key] = val
             }
+            accept(msg)
           }
           catch(previousError)
           {
@@ -146,8 +170,6 @@ class RedisServiceStream
             error.chain = { previousError, stream, id }
             reject(error)
           }
-          
-          accept(msg)
         }
       })
     })
@@ -169,7 +191,7 @@ class RedisServiceStream
               const error = new Error('Lazyloading consumer group failed')
               error.code  = 'E_REDIS_LAZYLOADING_CONSUMER_GROUP'
               error.chain = { previousError, stream, group }
-              reject(error)
+              return reject(error)
             }
           }
         }
