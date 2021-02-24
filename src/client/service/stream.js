@@ -126,11 +126,17 @@ class RedisServiceStream
     })
   }
 
-  read(stream, id)
+  async read(stream, id)
+  {
+    const response = await this.readRange(stream, id, id)
+    return response.length === 1 ? response[0] : null
+  }
+
+  readRange(stream, from, to)
   {
     return new Promise((accept, reject) =>
     {
-      this.gateway.xread('COUNT', 1, 'STREAMS', stream, id, async (previousError, result) =>
+      this.gateway.XRANGE(stream, from, to, async (previousError, result) =>
       {
         if(previousError)
         {
@@ -139,18 +145,15 @@ class RedisServiceStream
           error.chain = { previousError, stream, id }
           reject(error)
         }
-        else if(result === null)
-        {
-          accept(result)
-        }
         else
         {
-          const
-            dto = result[0][1][0][1],
-            msg = {}
-
-          try
+          const output = []
+          for(let n = 0; n < result.length; n++)
           {
+            const
+              dto = result[n][1],
+              msg = {}
+            
             // TODO move to mapper
             // mapping dto from a csv array to a json object
             for(let i = 1; i < dto.length; i += 2)
@@ -161,7 +164,13 @@ class RedisServiceStream
   
               msg[key] = val
             }
-            accept(msg)
+
+            output.push(msg)
+          }
+  
+          try
+          {
+            accept(output)
           }
           catch(previousError)
           {
