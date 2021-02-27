@@ -2,6 +2,7 @@ const
   redis               = require('redis'),
   Events              = require('events'),
   RedisClient         = require('.'),
+  RedisConnection     = require('./service/connection'),
   RedisHash           = require('./service/hash'),
   RedisKey            = require('./service/key'),
   RedisList           = require('./service/list'),
@@ -27,6 +28,7 @@ class RedisClientLocator extends LocatorConstituent
       options       = configuration.find('client/redis/gateway'),
       client        = redis.createClient(options),
       eventbus      = new Events(),
+      connection    = new RedisConnection(client),
       hash          = new RedisHash(client),
       key           = new RedisKey(client),
       list          = new RedisList(client),
@@ -35,7 +37,7 @@ class RedisClientLocator extends LocatorConstituent
       factory       = this.locate.bind(this),
       transaction   = new RedisTransaction(client)
 
-    return new RedisClient(client, factory, hash, key, list, pubsub, stream, transaction)
+    return new RedisClient(client, factory, connection, hash, key, list, pubsub, stream, transaction)
   }
 }
 

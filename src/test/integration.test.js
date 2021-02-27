@@ -24,7 +24,22 @@ describe('Redis client test suit', () =>
 
   after(() =>
   {
-    core.locate('redis/client').quit()
+    core.locate('redis/client').connection.quit()
+  })
+
+  describe('Redis service connection', () =>
+  {
+    it('can list clients', async function()
+    {
+      const
+        client = core.locate('redis/client'),
+        result = await client.connection.clientList()
+
+      console.log(result)
+  
+      context(this, { title:'context', value:{ result }})
+      expect(Array.isArray(result)).to.equal(true)
+    })
   })
 
   describe('Redis service hash', () =>
@@ -156,7 +171,7 @@ describe('Redis client test suit', () =>
       subscriber.pubsub.subscribe(channel, (dto) =>
       {
         expect(dto).to.deep.equal(msg)
-        subscriber.quit()
+        subscriber.connection.quit()
         done()
       })
     })
@@ -232,7 +247,7 @@ describe('Redis client test suit', () =>
         writeResult = await session.key.write(key, value),
         execResult  = await session.transaction.exec()
 
-      await session.quit()
+      await session.connection.quit()
   
       context(this, { title:'context', value:{ key, value, multiResult, writeResult, execResult }})
       expect(execResult).to.not.equal(null)
@@ -248,7 +263,7 @@ describe('Redis client test suit', () =>
         writeResult = await client.key.read(key),
         execResult  = await session.transaction.exec()
 
-      await session.quit()
+      await session.connection.quit()
   
       context(this, { title:'context', value:{ key, value, watchResult, multiResult, writeResult, execResult }})
       expect(execResult).to.not.equal(null)
