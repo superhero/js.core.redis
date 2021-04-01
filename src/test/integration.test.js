@@ -69,6 +69,26 @@ describe('Redis client test suit', () =>
       expect(result).to.deep.equal(value)
     })
 
+    it('field exists', async function()
+    {
+      const
+        client = core.locate('redis/client'),
+        result = await client.hash.fieldExists(key, field)
+  
+      context(this, { title:'context', value:{ key, field, result }})
+      expect(result).to.equal(1)
+    })
+
+    it('can read all fields and values', async function()
+    {
+      const
+        client = core.locate('redis/client'),
+        result = await client.hash.readAll(key)
+  
+      context(this, { title:'context', value:{ key, result }})
+      expect(result[field]).to.deep.equal(value)
+    })
+
     it('can delete a hash', async function()
     {
       const

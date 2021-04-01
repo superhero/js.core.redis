@@ -83,6 +83,64 @@ class RedisServiceHash
       })
     })
   }
+
+  fieldExists(key, field)
+  {
+    return new Promise((accept, reject) =>
+    {
+      this.gateway.hexists(key, field, (previousError, response) =>
+      {
+        if(previousError)
+        {
+          const error = new Error('hash field exists failed')
+          error.code  = 'E_REDIS_HASH_FIELD_EXISTS'
+          error.chain = { previousError, key, field }
+          reject(error)
+        }
+        else
+        {
+          accept(response)
+        }
+      })
+    })
+  }
+
+  readAll(key)
+  {
+    return new Promise((accept, reject) =>
+    {
+      this.gateway.hgetall(key, (previousError, response) =>
+      {
+        if(previousError)
+        {
+          const error = new Error('read all hash fields and values failed')
+          error.code  = 'E_REDIS_HASH_READ_ALL'
+          error.chain = { previousError, key }
+          reject(error)
+        }
+        else
+        {
+          try
+          {
+            for(const attr in response)
+            {
+              response[attr] = JSON.parse(response[attr])
+            }
+
+            accept(response)
+          }
+          catch(previousError)
+          {
+            console.log(previousError)
+            const error = new Error('read hash all error occured when decoding the response')
+            error.code  = 'E_REDIS_HASH_READ_ALL'
+            error.chain = { previousError, key, response }
+            reject(error)
+          }
+        }
+      })
+    })
+  }
 }
 
 module.exports = RedisServiceHash
