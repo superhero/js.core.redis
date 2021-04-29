@@ -40,6 +40,12 @@ class RedisServicePubsub
     this.eventbus.on(channel, observer)
   }
 
+  unsubscribe(channel)
+  {
+    this.gateway.unsubscribe(channel)
+    this.eventbus.removeAllListeners(channel)
+  }
+
   publish(channel, msg = null)
   {
     const encoded = JSON.stringify(msg)
