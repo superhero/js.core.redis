@@ -89,6 +89,17 @@ describe('Redis client test suit', () =>
       expect(result[field]).to.deep.equal(value)
     })
 
+    it('can increment a hash field', async function()
+    {
+      const
+        inckey = 'test-inchash-' + Date.now(),
+        client = core.locate('redis/client'),
+        result = await client.hash.increment(inckey, 'field')
+  
+      context(this, { title:'context', value:{ key, result }})
+      expect(result).to.equal('1')
+    })
+
     it('can delete a hash', async function()
     {
       const
@@ -134,6 +145,17 @@ describe('Redis client test suit', () =>
   
       context(this, { title:'context', value:{ key, result }})
       expect(result).to.equal(1)
+    })
+
+    it('can increment a key', async function()
+    {
+      const
+        inckey = 'test-inckey-' + Date.now(),
+        client = core.locate('redis/client'),
+        result = await client.key.increment(inckey)
+  
+      context(this, { title:'context', value:{ key, result }})
+      expect(result).to.equal('1')
     })
   })
 

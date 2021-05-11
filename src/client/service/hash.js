@@ -63,6 +63,27 @@ class RedisServiceHash
     })
   }
 
+  increment(key, field, i = 1)
+  {
+    return new Promise((accept, reject) =>
+    {
+      this.gateway.hincrbyfloat(key, field, i, (previousError, response) =>
+      {
+        if(previousError)
+        {
+          const error = new Error('increment key failed')
+          error.code  = 'E_REDIS_HASH_INCREMENT'
+          error.chain = { previousError, key }
+          reject(error)
+        }
+        else
+        {
+          accept(response)
+        }
+      })
+    })
+  }
+
   delete(key, field)
   {
     return new Promise((accept, reject) =>
