@@ -195,6 +195,44 @@ describe('Redis client test suit', () =>
       expect(result).to.deep.equal(value)
     })
   })
+  
+  describe('Redis service ordered', () =>
+  {
+    const
+      key   = 'test-ordered',
+      value = 123,
+      score = 10
+
+    it('can write to an ordered set', async function()
+    {
+      const
+        client = core.locate('redis/client'),
+        result = await client.ordered.write(key, value, score)
+  
+      context(this, { title:'context', value:{ key, value, score, result }})
+      expect(result).to.equal(1)
+    })
+  
+    it('can read from an ordered set', async function()
+    {
+      const
+        client = core.locate('redis/client'),
+        result = await client.ordered.read(key, score)
+  
+      context(this, { title:'context', value:{ key, value, score, result }})
+      expect(result).to.deep.equal([ value ])
+    })
+
+    it('can delete a from an ordered set by score', async function()
+    {
+      const
+        client = core.locate('redis/client'),
+        result = await client.key.delete(key, score)
+  
+      context(this, { title:'context', value:{ key, score, result }})
+      expect(result).to.equal(1)
+    })
+  })
 
   describe('Redis service pubsub', () =>
   {

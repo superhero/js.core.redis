@@ -142,7 +142,7 @@ class RedisServiceStream
         {
           const error = new Error('stream error occured')
           error.code  = 'E_REDIS_STREAM_READ_GATEWAY'
-          error.chain = { previousError, stream, id }
+          error.chain = { previousError, stream, from, to }
           reject(error)
         }
         else

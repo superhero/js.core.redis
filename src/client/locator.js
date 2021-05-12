@@ -6,6 +6,7 @@ const
   RedisHash           = require('./service/hash'),
   RedisKey            = require('./service/key'),
   RedisList           = require('./service/list'),
+  RedisOrdered        = require('./service/ordered'),
   RedisPubsub         = require('./service/pubsub'),
   RedisStream         = require('./service/stream'),
   RedisTransaction    = require('./service/transaction'),
@@ -32,12 +33,13 @@ class RedisClientLocator extends LocatorConstituent
       hash          = new RedisHash(client),
       key           = new RedisKey(client),
       list          = new RedisList(client),
+      ordered       = new RedisOrdered(client),
       pubsub        = new RedisPubsub(client, eventbus),
       stream        = new RedisStream(client, console),
       factory       = this.locate.bind(this),
       transaction   = new RedisTransaction(client)
 
-    return new RedisClient(client, factory, connection, hash, key, list, pubsub, stream, transaction)
+    return new RedisClient(client, factory, connection, hash, key, list, ordered, pubsub, stream, transaction)
   }
 }
 
