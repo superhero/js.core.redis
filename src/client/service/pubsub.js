@@ -7,7 +7,7 @@ class RedisServicePubsub
   {
     this.gateway      = gateway
     this.eventbus     = eventbus
-    this.subscribers  = []
+    this.subscribers  = {}
 
     this.gateway.on('message', this.onMessage.bind(this))
   }
@@ -37,8 +37,12 @@ class RedisServicePubsub
    */
   subscribe(channel, observer)
   {
+    if(this.subscribers[channel] === undefined)
+    {
+      this.subscribers[channel] = []
+    }
     this.gateway.subscribe(channel)
-    const subscriberId = this.subscribers.push(observer)
+    const subscriberId = this.subscribers[channel].push(observer)
     this.eventbus.on(channel, observer)
     return subscriberId - 1
   }
@@ -49,13 +53,16 @@ class RedisServicePubsub
    */
   unsubscribe(channel, subscriberId)
   {
-    const subscriber = this.subscribers[subscriberId]
-    this.eventbus.removeListener(channel, subscriber)
-    delete this.subscribers[subscriberId]
-    
+    if(this.subscribers[channel])
+    {
+      const subscriber = this.subscribers[channel][subscriberId]
+      this.eventbus.removeListener(channel, subscriber)
+      delete this.subscribers[channel][subscriberId]
+    }
     if(this.eventbus.listeners(channel).length === 0) 
     {
       this.gateway.unsubscribe(channel)
+      delete this.subscribers[channel]
     }
   }
 
