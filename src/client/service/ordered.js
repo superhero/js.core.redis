@@ -85,6 +85,29 @@ class RedisServiceOrdered
       })
     })
   }
+
+  deleteValue(key, value)
+  {
+    return new Promise((accept, reject) =>
+    {
+      const encoded = JSON.stringify(value)
+
+      this.gateway.zrem(key, encoded, (previousError, response) =>
+      {
+        if(previousError)
+        {
+          const error = new Error('delete ordered set value failed')
+          error.code  = 'E_REDIS_ORDERED_DELETE_VALUE'
+          error.chain = { previousError, key, value }
+          reject(error)
+        }
+        else
+        {
+          accept(response)
+        }
+      })
+    })
+  }
 }
 
 module.exports = RedisServiceOrdered

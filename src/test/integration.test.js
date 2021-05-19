@@ -227,9 +227,19 @@ describe('Redis client test suit', () =>
     {
       const
         client = core.locate('redis/client'),
-        result = await client.key.delete(key, score)
+        result = await client.ordered.delete(key, score)
   
       context(this, { title:'context', value:{ key, score, result }})
+      expect(result).to.equal(1)
+    })
+
+    it('can delete a from an ordered set by value', async function()
+    {
+      const client = core.locate('redis/client')
+      await client.ordered.write(key, value, score)
+      const result = await client.ordered.deleteValue(key, value)
+  
+      context(this, { title:'context', value:{ key, value, score, result }})
       expect(result).to.equal(1)
     })
   })
