@@ -84,17 +84,17 @@ class RedisServiceKey
     })
   }
 
-  expire(key)
+  expire(key, seconds)
   {
     return new Promise((accept, reject) =>
     {
-      this.gateway.expire(key, (previousError, response) =>
+      this.gateway.expire(key, seconds, (previousError, response) =>
       {
         if(previousError)
         {
           const error = new Error('expire key failed')
           error.code  = 'E_REDIS_KEY_EXPIRE'
-          error.chain = { previousError, key }
+          error.chain = { previousError, key, seconds }
           reject(error)
         }
         else

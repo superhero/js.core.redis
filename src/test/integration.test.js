@@ -126,6 +126,20 @@ describe('Redis client test suit', () =>
       context(this, { title:'context', value:{ key, value, result }})
       expect(result).to.equal('OK')
     })
+
+    it('can expire a key', async function()
+    {
+      const
+        seconds = 10,
+        client  = core.locate('redis/client'),
+        result  = await client.key.write(key, value),
+        expired = await client.key.expire(key, seconds)
+
+      context(this, { title:'context', value:{ key, value, result }})
+
+      expect(result).to.equal('OK')
+      expect(expired).to.equal(1)
+    })
   
     it('can read a key', async function()
     {
