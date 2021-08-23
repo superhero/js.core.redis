@@ -271,13 +271,12 @@ describe('Redis client test suit', () =>
         subscriber  = client.createSession()
       
       context(this, { title:'context', value:{ channel, msg }})
-      subscriber.pubsub.gateway.on('subscribe', () => client.pubsub.publish(channel, msg))
       subscriber.pubsub.subscribe(channel, (dto) =>
       {
         expect(dto).to.deep.equal(msg)
         subscriber.connection.quit()
         done()
-      })
+      }).then(() => client.pubsub.publish(channel, msg))
     })
   })
 
