@@ -35,8 +35,6 @@ describe('Redis client test suit', () =>
         client = core.locate('redis/client'),
         result = await client.connection.clientList()
 
-      console.log(result)
-  
       context(this, { title:'context', value:{ result }})
       expect(Array.isArray(result)).to.equal(true)
     })
@@ -232,6 +230,16 @@ describe('Redis client test suit', () =>
       const
         client = core.locate('redis/client'),
         result = await client.ordered.read(key, score)
+  
+      context(this, { title:'context', value:{ key, value, score, result }})
+      expect(result).to.deep.equal([ value ])
+    })
+
+    it('can read all values from an ordered set when emitting the min and max arguments', async function()
+    {
+      const
+        client = core.locate('redis/client'),
+        result = await client.ordered.read(key)
   
       context(this, { title:'context', value:{ key, value, score, result }})
       expect(result).to.deep.equal([ value ])

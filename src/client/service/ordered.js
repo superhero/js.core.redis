@@ -34,6 +34,9 @@ class RedisServiceOrdered
   read(key, min, max)
   {
     max = max || min
+    min = min || '-inf'
+    max = max || '+inf'
+
     return new Promise((accept, reject) =>
     {
       this.gateway.zrangebyscore(key, min, max, (previousError, responses) =>
