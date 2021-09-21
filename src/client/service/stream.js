@@ -13,6 +13,14 @@ class RedisServiceStream
   {
     return new Promise((accept, reject) =>
     {
+      if(typeof msg !== 'object')
+      {
+        const error = new Error('can only write a message (msg) of type "object"')
+        error.code  = 'E_REDIS_STREAM_WRITE_INVALID_MESSAGE'
+        error.chain = { previousError, stream, msg }
+        return reject(error)
+      }
+
       const
         entries = Object.entries(msg),
         dto     = []
