@@ -192,11 +192,17 @@ class RedisServiceStream
     })
   }
 
-  lazyloadConsumerGroup(stream, group)
+  /**
+   * @param {string} stream 
+   * @param {string} group 
+   * @param {string} [startFrom=$] Stream id to start from, default to $, meaning from the last inserted id. 
+   *                               Specify 0 to start from the beginning and read all messages from the start
+   */
+  lazyloadConsumerGroup(stream, group, startFrom = '$')
   {
     return new Promise((accept, reject) =>
     {
-      this.gateway.xgroup('CREATE', stream, group, '$', 'MKSTREAM', (previousError, response) =>
+      this.gateway.xgroup('CREATE', stream, group, startFrom, 'MKSTREAM', (previousError, response) =>
       {
         if(previousError)
         {
