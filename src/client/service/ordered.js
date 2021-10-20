@@ -67,6 +67,36 @@ class RedisServiceOrdered
     })
   }
 
+  /**
+   * @param {string} key 
+   * @param {boolean} [min=true] if to return the smallest or largest score
+   */
+  readScore(key, min = true)
+  {
+    return new Promise((accept, reject) =>
+    {
+      const order = min
+                  ? ['-inf', '+inf']
+                  : ['+inf', '-inf']
+
+      this.gateway.zrangebyscore(key, ...order, 'WITHSCORES', 'LIMIT', 0, 1, (previousError, responses) =>
+      {
+        if(previousError)
+        {
+          const error = new Error('read ordered set score failed')
+          error.code  = 'E_REDIS_ORDERED_READ_SCORE'
+          error.chain = { previousError, key, min }
+          reject(error)
+        }
+        else
+        {
+          const score = !!responses.length && Number(responses.pop())
+          accept(score)
+        }
+      })
+    })
+  }
+
   delete(key, min, max)
   {
     max = max || min

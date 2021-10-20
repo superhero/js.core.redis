@@ -208,7 +208,7 @@ describe('Redis client test suit', () =>
     })
   })
   
-  describe('Redis service ordered', () =>
+  describe.only('Redis service ordered', () =>
   {
     const
       key   = 'test-ordered',
@@ -233,6 +233,16 @@ describe('Redis client test suit', () =>
   
       context(this, { title:'context', value:{ key, value, score, result }})
       expect(result).to.deep.equal([ value ])
+    })
+  
+    it('can read min score from an ordered set', async function()
+    {
+      const
+        client = core.locate('redis/client'),
+        result = await client.ordered.readScore(key)
+  
+      context(this, { title:'context', value:{ key, score, result }})
+      expect(result).to.equal(score)
     })
 
     it('can read all values from an ordered set when emitting the min and max arguments', async function()
