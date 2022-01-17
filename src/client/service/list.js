@@ -15,169 +15,138 @@ class RedisServiceList
    * @param {number} start 
    * @param {number} stop sent to redis after subtracted with the value 1
    */
-  range(key, start, stop)
+  async range(key, start, stop)
   {
-    return new Promise((accept, reject) =>
+    let response
+
+    try
     {
-      // list 0 10 will return 11 elements, that is, the rightmost item is included. 
-      // this is not consistent with the behavior of nodejs
-      this.gateway.lrange(key, start, stop - 1, (previousError, response) =>
-      {
-        if(previousError)
-        {
-          const error = new Error('range list error occured')
-          error.code  = 'E_REDIS_LIST_RANGE'
-          error.chain = { previousError, key, start, stop }
-          reject(error)
-        }
-        else
-        {
-          try
-          {
-            const decoded = response && response.map((item) => JSON.parse(item))
-            accept(decoded)
-          }
-          catch(previousError)
-          {
-            const error = new Error('range list error occured when decoding the response')
-            error.code  = 'E_REDIS_LIST_RANGE'
-            error.chain = { previousError, key, start, stop }
-            reject(error)
-          }
-        }
-      })
-    })
+      response = await this.gateway.cmd('LRANGE', key, start, stop - 1)
+    }
+    catch(previousError)
+    {
+      const error = new Error('range list error occured')
+      error.code  = 'E_REDIS_LIST_RANGE'
+      error.chain = { previousError, key, start, stop }
+      throw error
+    }
+
+    try
+    {
+      return response && response.map((item) => JSON.parse(item))
+    }
+    catch(previousError)
+    {
+      const error = new Error('range list error occured when decoding the response')
+      error.code  = 'E_REDIS_LIST_RANGE'
+      error.chain = { previousError, key, start, stop }
+      throw error
+    }
   }
 
-  length(key)
+  async length(key)
   {
-    return new Promise((accept, reject) =>
+    try
     {
-      this.gateway.llen(key, (previousError, response) =>
-      {
-        if(previousError)
-        {
-          const error = new Error('list length error occured')
-          error.code  = 'E_REDIS_LIST_LENGTH'
-          error.chain = { previousError, key, start, stop }
-          reject(error)
-        }
-        else
-        {
-          accept(response)
-        }
-      })
-    })
+      return await this.gateway.cmd('LLEN', key)
+    }
+    catch(previousError)
+    {
+      const error = new Error('list length error occured')
+      error.code  = 'E_REDIS_LIST_LENGTH'
+      error.chain = { previousError, key }
+      throw error
+    }
   }
 
-  lpush(key, value)
+  async lpush(key, value)
   {
-    return new Promise((accept, reject) =>
+    try
     {
       const encoded = JSON.stringify(value)
-
-      this.gateway.lpush(key, encoded, (previousError, response) =>
-      {
-        if(previousError)
-        {
-          const error = new Error('left push list error occured')
-          error.code  = 'E_REDIS_LIST_PUSH_LEFT'
-          error.chain = { previousError, key, value }
-          reject(error)
-        }
-        else
-        {
-          accept(response)
-        }
-      })
-    })
-  }
-
-  lpop(key)
-  {
-    return new Promise((accept, reject) =>
+      return await this.gateway.cmd('LPUSH', key, encoded)
+    }
+    catch(previousError)
     {
-      this.gateway.lpop(key, (previousError, response) =>
-      {
-        if(previousError)
-        {
-          const error = new Error('left pop list error occured')
-          error.code  = 'E_REDIS_LIST_POP_LEFT'
-          error.chain = { previousError, key }
-          reject(error)
-        }
-        else
-        {
-          try
-          {
-            const decoded = JSON.parse(response)
-            accept(decoded)
-          }
-          catch(previousError)
-          {
-            const error = new Error('left pop list error occured when decoding the response')
-            error.code  = 'E_REDIS_LIST_POP_LEFT'
-            error.chain = { previousError, key, response }
-            reject(error)
-          }
-        }
-      })
-    })
+      const error = new Error('left push list error occured')
+      error.code  = 'E_REDIS_LIST_PUSH_LEFT'
+      error.chain = { previousError, key, value }
+      throw error
+    }
   }
 
-  rpush(key, value)
+  async lpop(key)
   {
-    return new Promise((accept, reject) =>
+    let response
+
+    try
+    {
+      response = await this.gateway.cmd('LPOP', key)
+    }
+    catch(previousError)
+    {
+      const error = new Error('left pop list error occured')
+      error.code  = 'E_REDIS_LIST_POP_LEFT'
+      error.chain = { previousError, key }
+      throw error
+    }
+
+    try
+    {
+      return JSON.parse(response)
+    }
+    catch(previousError)
+    {
+      const error = new Error('left pop list error occured when decoding the response')
+      error.code  = 'E_REDIS_LIST_POP_LEFT'
+      error.chain = { previousError, key, response }
+      throw error
+    }
+  }
+
+  async rpush(key, value)
+  {
+    try
     {
       const encoded = JSON.stringify(value)
-
-      this.gateway.rpush(key, encoded, (previousError, response) =>
-      {
-        if(previousError)
-        {
-          const error = new Error('right push list error occured')
-          error.code  = 'E_REDIS_LIST_PUSH_RIGHT'
-          error.chain = { previousError, key, value }
-          reject(error)
-        }
-        else
-        {
-          accept(response)
-        }
-      })
-    })
+      return await this.gateway.cmd('RPUSH', key, encoded)
+    }
+    catch(previousError)
+    {
+      const error = new Error('right push list error occured')
+      error.code  = 'E_REDIS_LIST_PUSH_RIGHT'
+      error.chain = { previousError, key, value }
+      throw error
+    }
   }
 
-  rpop(key)
+  async rpop(key)
   {
-    return new Promise((accept, reject) =>
+    let response
+
+    try
     {
-      this.gateway.rpop(key, (previousError, response) =>
-      {
-        if(previousError)
-        {
-          const error = new Error('right pop list error occured')
-          error.code  = 'E_REDIS_LIST_POP_RIGHT'
-          error.chain = { previousError, key }
-          reject(error)
-        }
-        else
-        {
-          try
-          {
-            const decoded = JSON.parse(response)
-            accept(decoded)
-          }
-          catch(previousError)
-          {
-            const error = new Error('right pop list error occured when decoding the response')
-            error.code  = 'E_REDIS_LIST_POP_RIGHT'
-            error.chain = { previousError, key, response }
-            reject(error)
-          }
-        }
-      })
-    })
+      response = await this.gateway.cmd('RPOP', key)
+    }
+    catch(previousError)
+    {
+      const error = new Error('right pop list error occured')
+      error.code  = 'E_REDIS_LIST_POP_RIGHT'
+      error.chain = { previousError, key }
+      throw error
+    }
+
+    try
+    {
+      return JSON.parse(response)
+    }
+    catch(previousError)
+    {
+      const error = new Error('right pop list error occured when decoding the response')
+      error.code  = 'E_REDIS_LIST_POP_RIGHT'
+      error.chain = { previousError, key, response }
+      throw error
+    }
   }
 }
 

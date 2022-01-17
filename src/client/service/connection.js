@@ -8,45 +8,34 @@ class RedisServiceConnection
     this.gateway = gateway
   }
 
-  quit()
+  async connect()
   {
-    return new Promise((accept, reject) =>
+    try
     {
-      this.gateway.quit((previousError) =>
-      {
-        if(previousError)
-        {
-          const error = new Error('failed to quit redis connection')
-          error.code  = 'E_REDIS_CONNECTION_QUIT'
-          error.chain = { previousError }
-          reject(error)
-        }
-
-        accept()
-      })
-    })
+      return await this.gateway.redis.connect()
+    }
+    catch(previousError)
+    {
+      const error = new Error('failed to connect to redis')
+      error.code  = 'E_REDIS_CONNECTION_CONNECT'
+      error.chain = { previousError }
+      throw error
+    }
   }
 
-  clientList(...args)
+  async quit()
   {
-    return new Promise((accept, reject) =>
+    try
     {
-      this.gateway.client('LIST', args, (previousError, response) =>
-      {
-        if(previousError)
-        {
-          const error = new Error('redis client list failed')
-          error.code  = 'E_REDIS_CONNECTION_CLIENT_LIST'
-          error.chain = { previousError, args }
-          console.log(previousError)
-          reject(error)
-        }
-        else
-        {
-          accept(response.split('\n').filter(_=>_))
-        }
-      })
-    })
+      return await this.gateway.redis.quit()
+    }
+    catch(previousError)
+    {
+      const error = new Error('failed to quit redis connection')
+      error.code  = 'E_REDIS_CONNECTION_QUIT'
+      error.chain = { previousError }
+      throw error
+    }
   }
 }
 

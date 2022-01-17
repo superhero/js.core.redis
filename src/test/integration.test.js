@@ -22,28 +22,12 @@ describe('Redis client test suit', () =>
     core.locate('core/bootstrap').bootstrap().then(done)
   })
 
-  after(() =>
-  {
-    core.locate('redis/client').connection.quit()
-  })
-
-  describe('Redis service connection', () =>
-  {
-    it('can list clients', async function()
-    {
-      const
-        client = core.locate('redis/client'),
-        result = await client.connection.clientList()
-
-      context(this, { title:'context', value:{ result }})
-      expect(Array.isArray(result)).to.equal(true)
-    })
-  })
+  after(() => core.locate('redis/client').connection.quit())
 
   describe('Redis service hash', () =>
   {
     const
-      key   = 'test-hash-key', 
+      key   = 'test-hash-key-' + Date.now(), 
       field = 'test-hash-field', 
       value = { test:{ hash:'value' }}
 
@@ -208,7 +192,7 @@ describe('Redis client test suit', () =>
     })
   })
   
-  describe.only('Redis service ordered', () =>
+  describe('Redis service ordered', () =>
   {
     const
       key   = 'test-ordered',
@@ -289,12 +273,14 @@ describe('Redis client test suit', () =>
         subscriber  = client.createSession()
       
       context(this, { title:'context', value:{ channel, msg }})
-      subscriber.pubsub.subscribe(channel, (dto) =>
-      {
-        expect(dto).to.deep.equal(msg)
-        subscriber.connection.quit()
-        done()
-      }).then(() => client.pubsub.publish(channel, msg))
+      
+      subscriber.connection.connect().then(() =>
+        subscriber.pubsub.subscribe(channel, (dto) =>
+        {
+          expect(dto).to.deep.equal(msg)
+          subscriber.connection.quit()
+          done()
+        }).then(() => client.pubsub.publish(channel, msg).catch(done)).catch(done))
     })
   })
 

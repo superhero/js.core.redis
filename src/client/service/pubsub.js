@@ -3,101 +3,73 @@
  */
 class RedisServicePubsub
 {
-  constructor(gateway, eventbus)
+  constructor(gateway)
   {
-    this.gateway      = gateway
-    this.eventbus     = eventbus
-    this.subscribers  = {}
-
-    this.gateway.on('message', this.onMessage.bind(this))
+    this.gateway = gateway
   }
 
   /**
-   * @private
    * @param {string} channel 
-   * @param {*} msg 
+   * @param {object} [msg=null]
    */
-  onMessage(channel, msg)
+  async publish(channel, msg = null)
   {
-    const dto = JSON.parse(msg)
-    this.eventbus.emit(channel, dto)
-  }
-
-  publish(channel, msg = null)
-  {
-    const encoded = JSON.stringify(msg)
-    this.gateway.publish(channel, encoded)
+    try
+    {
+      const encoded = JSON.stringify(msg)
+      await this.gateway.redis.publish(channel, encoded)
+    }
+    catch(previousError)
+    {
+      console.log(previousError)
+      const error = new Error('publish command failed')
+      error.code  = 'E_REDIS_PUBSUB_PUBLISH'
+      error.chain = { previousError, channel, msg }
+      throw error
+    }
   }
 
   /**
    * @param {string} channel 
    * @param {function} observer 
-   * @param {number} [timeout=10e3] milliseconds before timeout, timeout is triggered if the subscription goes unverified
-   * 
-   * @returns {number} subscriber id
    */
-  subscribe(channel, observer, timeout = 10e3)
+  async subscribe(channel, observer)
   {
-    if(this.subscribers[channel] === undefined)
+    try
     {
-      this.subscribers[channel] = []
-    }
-  
-    // we need to await the subscription due to race condition issues that appears if we neglect it
-    // TODO!!! does the event "subscribe" trigger multiple times if the same subscription is observed multiple times?
-    return new Promise((accept, reject) => 
-    {
-      const
-        cleanup   = () => this.gateway.removeListener('subscribe', completed),
-        completed = (subscriptionChannel) =>
-        {
-          if(subscriptionChannel === channel)
-          {
-            cleanup()
-            accept(subscriberId)
-          }
-        }
-
-      this.gateway.on('subscribe', completed)
-      const subscriberId = this.subscribers[channel].push(observer)
-      this.eventbus.on(channel, observer)
-      this.gateway.subscribe(channel)
-
-      setTimeout(() => 
+      await this.gateway.redis.pSubscribe(channel, (msg, noPatternChannel) => 
       {
-        const error = new Error('subscribe to a redis channel failed - timeout: ' + timeout)
-        error.code  = 'E_REDIS_PUBSUB_SUBSCRIBE_TIMEOUT'
-        error.chain = { channel, subscriberId, timeout }
-
-        cleanup()
-        reject(error)
-      }, timeout)
-    })
+        const dto = JSON.parse(msg)
+        observer(dto, channel, noPatternChannel)
+      })
+    }
+    catch(previousError)
+    {
+      console.log(previousError)
+      const error = new Error('subscribe command failed')
+      error.code  = 'E_REDIS_PUBSUB_SUBSCRIBE'
+      error.chain = { previousError, channel, observer }
+      throw error
+    }
   }
 
   /**
    * @param {string} channel 
-   * @param {number} subscriberId
    */
-  unsubscribe(channel, subscriberId)
+  async unsubscribe(channel)
   {
-    if(this.subscribers[channel])
+    try
     {
-      const subscriber = this.subscribers[channel][subscriberId]
-      this.eventbus.removeListener(channel, subscriber)
-      delete this.subscribers[channel][subscriberId]
+      await this.gateway.redis.connect()
+      await this.gateway.redis.pUnsubscribe(channel)
     }
-    if(this.eventbus.listeners(channel).length === 0) 
+    catch(previousError)
     {
-      this.gateway.unsubscribe(channel)
-      delete this.subscribers[channel]
+      const error = new Error('publish command failed')
+      error.code  = 'E_REDIS_PUBSUB_UNSUBSCRIBE'
+      error.chain = { previousError, channel }
+      throw error
     }
-  }
-
-  unsubscribeAll(channel)
-  {
-    this.gateway.unsubscribe(channel)
-    this.eventbus.removeAllListeners(channel)
   }
 }
 

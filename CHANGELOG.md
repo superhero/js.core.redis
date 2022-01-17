@@ -1,3 +1,6 @@
+2.0.0
+Started working with the npm redis version 4.X.X
+
 1.2.0
 Added a new aggregate: "ordered" which is an implementation of redis ordered set.
 

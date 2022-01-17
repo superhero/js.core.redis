@@ -8,138 +8,113 @@ class RedisServiceOrdered
     this.gateway = gateway
   }
 
-  write(key, value, score)
+  async write(key, value, score)
   {
-    return new Promise((accept, reject) =>
+    try
     {
       const encoded = JSON.stringify(value)
-
-      this.gateway.zadd(key, score, encoded, (previousError, response) =>
-      {
-        if(previousError)
-        {
-          const error = new Error('write ordered set failed')
-          error.code  = 'E_REDIS_SET_WRITE'
-          error.chain = { previousError, key, score, value }
-          reject(error)
-        }
-        else
-        {
-          accept(response)
-        }
-      })
-    })
+      return await this.gateway.cmd('ZADD', key, score, encoded)
+    }
+    catch(previousError)
+    {
+      const error = new Error('write ordered set failed')
+      error.code  = 'E_REDIS_SET_WRITE'
+      error.chain = { previousError, key, score, value }
+      throw error
+    }
   }
 
-  read(key, min, max)
+  async read(key, min, max)
   {
     max = max || min
     min = min || '-inf'
     max = max || '+inf'
 
-    return new Promise((accept, reject) =>
+    let response
+
+    try
     {
-      this.gateway.zrangebyscore(key, min, max, (previousError, responses) =>
-      {
-        if(previousError)
-        {
-          const error = new Error('read ordered set range failed')
-          error.code  = 'E_REDIS_ORDERED_READ'
-          error.chain = { previousError, key, min, max }
-          reject(error)
-        }
-        else
-        {
-          try
-          {
-            const decoded = responses.map((response) => JSON.parse(response))
-            accept(decoded)
-          }
-          catch(previousError)
-          {
-            const error = new Error('read ordered set range failed when decoding the response')
-            error.code  = 'E_REDIS_ORDERED_READ'
-            error.chain = { previousError, key, min, max, responses }
-            reject(error)
-          }
-        }
-      })
-    })
+      response = await this.gateway.cmd('ZRANGEBYSCORE', key, min, max)
+    }
+    catch(previousError)
+    {
+      const error = new Error('read ordered set range failed')
+      error.code  = 'E_REDIS_ORDERED_READ'
+      error.chain = { previousError, key, min, max }
+      throw error
+    }
+
+    try
+    {
+      const decoded = response.map((item) => JSON.parse(item))
+      return decoded
+    }
+    catch(previousError)
+    {
+      const error = new Error('read ordered set range failed when decoding the response')
+      error.code  = 'E_REDIS_ORDERED_READ'
+      error.chain = { previousError, key, min, max, response }
+      throw error
+    }
   }
 
   /**
    * @param {string} key 
    * @param {boolean} [min=true] if to return the smallest or largest score
    */
-  readScore(key, min = true)
+  async readScore(key, min = true)
   {
-    return new Promise((accept, reject) =>
+    try
     {
-      const order = min
-                  ? ['-inf', '+inf']
-                  : ['+inf', '-inf']
+      const 
+        order = min
+          ? ['-inf', '+inf']
+          : ['+inf', '-inf'],
+        response  = await this.gateway.cmd('ZRANGEBYSCORE', key, ...order, 'WITHSCORES', 'LIMIT', 0, 1),
+        score     = !!response.length && Number(response.pop())
 
-      this.gateway.zrangebyscore(key, ...order, 'WITHSCORES', 'LIMIT', 0, 1, (previousError, responses) =>
-      {
-        if(previousError)
-        {
-          const error = new Error('read ordered set score failed')
-          error.code  = 'E_REDIS_ORDERED_READ_SCORE'
-          error.chain = { previousError, key, min }
-          reject(error)
-        }
-        else
-        {
-          const score = !!responses.length && Number(responses.pop())
-          accept(score)
-        }
-      })
-    })
+      return score
+    }
+    catch(previousError)
+    {
+      const error = new Error('read ordered set score failed')
+      error.code  = 'E_REDIS_ORDERED_READ_SCORE'
+      error.chain = { previousError, key, min }
+      throw error
+    }
   }
 
-  delete(key, min, max)
+  async delete(key, min, max)
   {
     max = max || min
-    return new Promise((accept, reject) =>
+
+    try
     {
-      this.gateway.zremrangebyscore(key, min, max, (previousError, response) =>
-      {
-        if(previousError)
-        {
-          const error = new Error('delete ordered set by score range failed')
-          error.code  = 'E_REDIS_ORDERED_DELETE'
-          error.chain = { previousError, key, min, max }
-          reject(error)
-        }
-        else
-        {
-          accept(response)
-        }
-      })
-    })
+      return await this.gateway.cmd('ZREMRANGEBYSCORE', key, min, max)
+    }
+    catch(previousError)
+    {
+      const error = new Error('delete ordered set by score range failed')
+      error.code  = 'E_REDIS_ORDERED_DELETE'
+      error.chain = { previousError, key, min, max }
+      throw error
+    }
   }
 
-  deleteValue(key, value)
+  async deleteValue(key, value)
   {
-    return new Promise((accept, reject) =>
+    try
     {
       const encoded = JSON.stringify(value)
-
-      this.gateway.zrem(key, encoded, (previousError, response) =>
-      {
-        if(previousError)
-        {
-          const error = new Error('delete ordered set value failed')
-          error.code  = 'E_REDIS_ORDERED_DELETE_VALUE'
-          error.chain = { previousError, key, value }
-          reject(error)
-        }
-        else
-        {
-          accept(response)
-        }
-      })
-    })
+      return await this.gateway.cmd('ZREM', key, encoded)
+    }
+    catch(previousError)
+    {
+      const error = new Error('delete ordered set value failed')
+      error.code  = 'E_REDIS_ORDERED_DELETE_VALUE'
+      error.chain = { previousError, key, value }
+      throw error
+    }
   }
 }
 

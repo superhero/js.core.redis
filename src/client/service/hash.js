@@ -8,159 +8,134 @@ class RedisServiceHash
     this.gateway = gateway
   }
 
-  write(key, field, value)
+  async write(key, field, value)
   {
-    return new Promise((accept, reject) =>
+    try
     {
       const encoded = JSON.stringify(value)
-
-      this.gateway.hset(key, field, encoded, (previousError, response) =>
-      {
-        if(previousError)
-        {
-          const error = new Error('write hash error occured')
-          error.code  = 'E_REDIS_HASH_WRITE'
-          error.chain = { previousError, key, field, value }
-          reject(error)
-        }
-        else
-        {
-          accept(response)
-        }
-      })
-    })
+      return await this.gateway.cmd('HSET', key, field, encoded)
+    }
+    catch(previousError)
+    {
+      const error = new Error('write hash error occured')
+      error.code  = 'E_REDIS_HASH_WRITE'
+      error.chain = { previousError, key, field, value }
+      throw error
+    }
   }
 
-  read(key, field)
+  async read(key, field)
   {
-    return new Promise((accept, reject) =>
+    let response
+
+    try
     {
-      this.gateway.hget(key, field, (previousError, response) =>
-      {
-        if(previousError)
-        {
-          const error = new Error('read hash error occured')
-          error.code  = 'E_REDIS_HASH_READ'
-          error.chain = { previousError, key, field }
-          reject(error)
-        }
-        else
-        {
-          try
-          {
-            const decoded = JSON.parse(response)
-            accept(decoded)
-          }
-          catch(previousError)
-          {
-            const error = new Error('read hash error occured when decoding the response')
-            error.code  = 'E_REDIS_HASH_READ'
-            error.chain = { previousError, key, response }
-            reject(error)
-          }
-        }
-      })
-    })
+      response =  await this.gateway.cmd('HGET', key, field)
+    }
+    catch(previousError)
+    {
+      const error = new Error('read hash error occured')
+      error.code  = 'E_REDIS_HASH_READ'
+      error.chain = { previousError, key, field }
+      throw error
+    }
+
+    try
+    {
+      return JSON.parse(response)
+    }
+    catch(previousError)
+    {
+      const error = new Error('read hash error occured when decoding the response')
+      error.code  = 'E_REDIS_HASH_READ'
+      error.chain = { previousError, key, response }
+      throw error
+    }
   }
 
-  increment(key, field, i = 1)
+  async increment(key, field, i = 1)
   {
-    return new Promise((accept, reject) =>
+    try
     {
-      this.gateway.hincrbyfloat(key, field, i, (previousError, response) =>
-      {
-        if(previousError)
-        {
-          const error = new Error('increment key failed')
-          error.code  = 'E_REDIS_HASH_INCREMENT'
-          error.chain = { previousError, key }
-          reject(error)
-        }
-        else
-        {
-          accept(response)
-        }
-      })
-    })
+      return await this.gateway.cmd('HINCRBYFLOAT', key, field, i)
+    }
+    catch(previousError)
+    {
+      const error = new Error('increment key failed')
+      error.code  = 'E_REDIS_HASH_INCREMENT'
+      error.chain = { previousError, key }
+      throw error
+    }
   }
 
-  delete(key, field)
+  async delete(key, field)
   {
-    return new Promise((accept, reject) =>
+    try
     {
-      this.gateway.hdel(key, field, (previousError, response) =>
-      {
-        if(previousError)
-        {
-          const error = new Error('delete key failed')
-          error.code  = 'E_REDIS_HASH_DELETE'
-          error.chain = { previousError, key, field }
-          reject(error)
-        }
-        else
-        {
-          accept(response)
-        }
-      })
-    })
+      return await this.gateway.cmd('HDEL', key, field)
+    }
+    catch(previousError)
+    {
+      const error = new Error('delete key failed')
+      error.code  = 'E_REDIS_HASH_DELETE'
+      error.chain = { previousError, key, field }
+      throw error
+    }
   }
 
-  fieldExists(key, field)
+  async fieldExists(key, field)
   {
-    return new Promise((accept, reject) =>
+    try
     {
-      this.gateway.hexists(key, field, (previousError, response) =>
-      {
-        if(previousError)
-        {
-          const error = new Error('hash field exists failed')
-          error.code  = 'E_REDIS_HASH_FIELD_EXISTS'
-          error.chain = { previousError, key, field }
-          reject(error)
-        }
-        else
-        {
-          accept(response)
-        }
-      })
-    })
+      return await this.gateway.cmd('HEXISTS', key, field)
+    }
+    catch(previousError)
+    {
+      const error = new Error('hash field exists failed')
+      error.code  = 'E_REDIS_HASH_FIELD_EXISTS'
+      error.chain = { previousError, key, field }
+      throw error
+    }
   }
 
-  readAll(key)
+  async readAll(key)
   {
-    return new Promise((accept, reject) =>
-    {
-      this.gateway.hgetall(key, (previousError, response) =>
-      {
-        if(previousError)
-        {
-          const error = new Error('read all hash fields and values failed')
-          error.code  = 'E_REDIS_HASH_READ_ALL'
-          error.chain = { previousError, key }
-          reject(error)
-        }
-        else
-        {
-          try
-          {
-            for(const attr in response)
-            {
-              response[attr] = JSON.parse(response[attr])
-            }
+    let response
 
-            accept(response)
-          }
-          catch(previousError)
-          {
-            console.log(previousError)
-            const error = new Error('read hash all error occured when decoding the response')
-            error.code  = 'E_REDIS_HASH_READ_ALL'
-            error.chain = { previousError, key, response }
-            reject(error)
-          }
-        }
-      })
-    })
+    try
+    {
+      response = await this.gateway.cmd('HGETALL', key)
+    }
+    catch(previousError)
+    {
+      const error = new Error('read all hash fields and values failed')
+      error.code  = 'E_REDIS_HASH_READ_ALL'
+      error.chain = { previousError, key }
+      throw error
+    }
+
+    try
+    {
+      const output = {}
+
+      for(let i = 1; i < response.length; i += 2)
+      {
+        const
+          key = response[i-1],
+          val = JSON.parse(response[i])
+
+        output[key] = val
+      }
+
+      return output
+    }
+    catch(previousError)
+    {
+      const error = new Error('read hash all error occured when decoding the response')
+      error.code  = 'E_REDIS_HASH_READ_ALL'
+      error.chain = { previousError, key, response }
+      throw error
+    }
   }
 }
 
