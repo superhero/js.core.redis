@@ -16,8 +16,7 @@ module.exports =
     {
       gateway:
       {
-        'socket.host': process.env.REDIS_HOST,
-        'socket.port': process.env.REDIS_PORT
+        url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`
       }
     }
   }
