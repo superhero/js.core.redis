@@ -60,7 +60,6 @@ class RedisServicePubsub
   {
     try
     {
-      await this.gateway.redis.connect()
       await this.gateway.redis.pUnsubscribe(channel)
     }
     catch(previousError)
