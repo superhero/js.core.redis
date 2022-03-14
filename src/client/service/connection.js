@@ -8,6 +8,21 @@ class RedisServiceConnection
     this.gateway = gateway
   }
 
+  async auth(...args)
+  {
+    try
+    {
+      return await this.gateway.redis.auth(...args)
+    }
+    catch(previousError)
+    {
+      const error = new Error('failed auth process')
+      error.code  = 'E_REDIS_CONNECTION_AUTH'
+      error.chain = { previousError }
+      throw error
+    }
+  }
+
   async connect()
   {
     try
