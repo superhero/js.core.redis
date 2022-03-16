@@ -65,13 +65,14 @@ class RedisServiceStream
     }
     else
     {
-      const
+      let id, dto, msg
+
+      try
+      {
         id  = response[0][1][0][0],
         dto = response[0][1][0][1],
         msg = {}
 
-      try
-      {
         // mapping dto from a csv array to a json object
         for(let i = 1; i < dto.length; i += 2)
         {
@@ -86,7 +87,7 @@ class RedisServiceStream
       {
         const error = new Error('read from group - mapping failed')
         error.code  = 'E_REDIS_STREAM_READ_GROUP_MAPPER'
-        error.chain = { previousError, stream, group, id }
+        error.chain = { previousError, stream, group, response }
         throw error
       }
 
