@@ -31,10 +31,13 @@ class RedisServiceConnection
     }
     catch(previousError)
     {
-      const error = new Error('failed to connect to redis')
-      error.code  = 'E_REDIS_CONNECTION_CONNECT'
-      error.chain = { previousError }
-      throw error
+      if(previousError.message !== 'Socket already opened')
+      {
+        const error = new Error('failed to connect to redis')
+        error.code  = 'E_REDIS_CONNECTION_CONNECT'
+        error.chain = { previousError }
+        throw error
+      }
     }
   }
 
@@ -46,10 +49,13 @@ class RedisServiceConnection
     }
     catch(previousError)
     {
-      const error = new Error('failed to quit redis connection')
-      error.code  = 'E_REDIS_CONNECTION_QUIT'
-      error.chain = { previousError }
-      throw error
+      if(previousError.message !== 'The client is closed')
+      {
+        const error = new Error('failed to quit redis connection')
+        error.code  = 'E_REDIS_CONNECTION_QUIT'
+        error.chain = { previousError }
+        throw error
+      }
     }
   }
 }
