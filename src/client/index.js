@@ -3,10 +3,12 @@
  */
 class RedisClient
 {
-  constructor(gateway, factory, connection, hash, key, list, ordered, pubsub, stream, transaction)
+  constructor(config, console, gateway, factory, connection, hash, key, list, ordered, pubsub, stream, transaction)
   {
+    this.config         = config
+    this.console        = console
     this.gateway        = gateway
-    this.createSession  = factory
+    this.factoryCreate  = factory
     this.connection     = connection
     this.hash           = hash
     this.key            = key
@@ -15,6 +17,27 @@ class RedisClient
     this.pubsub         = pubsub
     this.stream         = stream
     this.transaction    = transaction
+  }
+
+  async bootstrap()
+  {
+    if(this.config.auth)
+    {
+      if(Array.isArray(this.config.auth))
+        await this.connection.auth(...this.config.auth)
+
+      else
+        await this.connection.auth(this.config.auth)
+
+      this.console.color('cyan').log('✔ redis connection authenticated')
+    }
+  }
+
+  createSession()
+  {
+    const session = this.factoryCreate()
+    session.bootstrap().catch((error) => this.console.error('RedisClient->createSession::catch', error))
+    return session
   }
 }
 

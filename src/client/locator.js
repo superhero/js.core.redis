@@ -1,6 +1,6 @@
 const 
-RedisClientFactory = require('./factory'),
-LocatorConstituent = require('superhero/core/locator/constituent')
+  RedisClientFactory = require('./factory'),
+  LocatorConstituent = require('superhero/core/locator/constituent')
 
 /**
  * @memberof Redis.Client
@@ -16,9 +16,9 @@ class RedisClientLocator extends LocatorConstituent
     const
       console       = this.locator.locate('core/console'),
       configuration = this.locator.locate('core/configuration'),
-      redisOptions  = configuration.find('client/redis/gateway'),
+      options       = configuration.find('client/redis'),
       factory       = new RedisClientFactory(),
-      client        = factory.create(console, redisOptions)
+      client        = factory.create(console, options)
 
     return client
   }

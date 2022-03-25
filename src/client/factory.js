@@ -20,10 +20,10 @@ class RedisClientFactory
   /**
    * @returns {RedisClient}
    */
-  create(console, redisOptions)
+  create(console, config)
   {
     const
-      client        = redis.createClient(redisOptions),
+      client        = redis.createClient(config.gateway),
       gateway       = new RedisClientGateway(client),
       connection    = new RedisConnection(gateway),
       hash          = new RedisHash(gateway),
@@ -32,10 +32,10 @@ class RedisClientFactory
       ordered       = new RedisOrdered(gateway),
       pubsub        = new RedisPubsub(gateway),
       stream        = new RedisStream(gateway, console),
-      factory       = this.create.bind(this, console, redisOptions),
+      factory       = this.create.bind(this, console, config),
       transaction   = new RedisTransaction(gateway)
 
-    return new RedisClient(gateway, factory, connection, hash, key, list, ordered, pubsub, stream, transaction)
+    return new RedisClient(config, console, gateway, factory, connection, hash, key, list, ordered, pubsub, stream, transaction)
   }
 }
 

@@ -5,6 +5,10 @@ module.exports =
 {
   core:
   {
+    bootstrap:
+    {
+      'redis-auth' : 'redis/client'
+    },
     locator:
     {
       'redis/client' : __dirname
