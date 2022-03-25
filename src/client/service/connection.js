@@ -12,7 +12,7 @@ class RedisServiceConnection
   {
     try
     {
-      return await this.gateway.redis.auth(...args)
+      return await this.gateway.cmd('AUTH', ...args)
     }
     catch(previousError)
     {
