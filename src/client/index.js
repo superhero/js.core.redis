@@ -19,7 +19,17 @@ class RedisClient
     this.transaction    = transaction
   }
 
-  async bootstrap()
+  bootstrap()
+  {
+    return this.auth()
+  }
+
+  createSession()
+  {
+    return this.factoryCreate()
+  }
+
+  async auth()
   {
     if(this.config.auth)
     {
@@ -31,13 +41,6 @@ class RedisClient
 
       this.console.color('cyan').log('✔ redis connection authenticated')
     }
-  }
-
-  createSession()
-  {
-    const session = this.factoryCreate()
-    session.bootstrap().catch((error) => this.console.error('RedisClient->createSession::catch', error))
-    return session
   }
 }
 
