@@ -1,3 +1,6 @@
+2.2.3
+set to terminate process on client error, in the future this solution will probably be more optional, but for now I need to rely on a process failure upon this event.
+
 2.0.0
 Started working with the npm redis version 4.X.X
 
