@@ -1,5 +1,6 @@
 const
   redis               = require('redis'),
+  process             = require('process'),
   RedisClient         = require('.'),
   RedisClientGateway  = require('./gateway'),
   RedisConnection     = require('./service/connection'),
@@ -34,6 +35,13 @@ class RedisClientFactory
       stream        = new RedisStream(gateway, console),
       factory       = this.create.bind(this, console, config),
       transaction   = new RedisTransaction(gateway)
+
+    client.on('error', (error) => 
+    {
+      console.error('redis client error:', error)
+      console.error('redis client error discovered, terminating process...')
+      process.nextTick(() => process.kill(process.pid, 'SIGKILL'))
+    })
 
     return new RedisClient(config, console, gateway, factory, connection, hash, key, list, ordered, pubsub, stream, transaction)
   }

@@ -19,14 +19,15 @@ class RedisClient
     this.transaction    = transaction
   }
 
-  bootstrap()
+  async bootstrap()
   {
-    return this.auth()
+    await this.auth()
   }
 
   createSession()
   {
-    return this.factoryCreate()
+    const session = this.factoryCreate()
+    return session
   }
 
   async auth()
