@@ -1,6 +1,6 @@
 {
   "name": "@superhero/core.redis",
-  "version": "2.2.3",
+  "version": "2.3.0",
   "description": "A redis wrapper for the core library",
   "repository": "git@github.com:superhero/js.core.redis.git",
   "license": "MIT",

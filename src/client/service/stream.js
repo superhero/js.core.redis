@@ -107,6 +107,21 @@ class RedisServiceStream
     }
   }
 
+  async delete(stream, id)
+  {
+    try
+    {
+      return await this.gateway.cmd('XDEL', stream, id)
+    }
+    catch(previousError)
+    {
+      const error = new Error('failed to delete stream item by id')
+      error.code  = 'E_REDIS_STREAM_DELETE_ITEM'
+      error.chain = { previousError, stream, id }
+      throw error
+    }
+  }
+
   async ack(stream, group, id)
   {
     try

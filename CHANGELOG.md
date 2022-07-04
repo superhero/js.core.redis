@@ -1,3 +1,6 @@
+2.3.0
+Added functionality to delete stream item by id.
+
 2.2.3
 set to terminate process on client error, in the future this solution will probably be more optional, but for now I need to rely on a process failure upon this event.
 
