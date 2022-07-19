@@ -43,13 +43,13 @@ class RedisServiceStream
     }
   }
 
-  async readGroup(stream, group, consumer)
+  async readGroup(stream, group, consumer, fromId = '>')
   {
     let response
 
     try
     {
-      response = await this.gateway.cmd('XREADGROUP', 'GROUP', group, 'consumer', 'COUNT', 1, 'STREAMS', stream, '>')
+      response = await this.gateway.cmd('XREADGROUP', 'GROUP', group, 'consumer', 'COUNT', 1, 'STREAMS', stream, fromId)
     }
     catch(previousError)
     {
