@@ -30,15 +30,15 @@ class RedisClient
     return session
   }
 
-  async auth()
+  async auth(key = this.config.auth)
   {
-    if(this.config.auth)
+    if(key)
     {
-      if(Array.isArray(this.config.auth))
-        await this.connection.auth(...this.config.auth)
+      if(Array.isArray(key))
+        await this.connection.auth(...key)
 
       else
-        await this.connection.auth(this.config.auth)
+        await this.connection.auth(key)
 
       this.console.color('cyan').log('✔ redis connection authenticated')
     }
