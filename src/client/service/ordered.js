@@ -116,6 +116,25 @@ class RedisServiceOrdered
       throw error
     }
   }
+
+  async has(key, value)
+  {
+    try
+    {
+      const
+        encoded = JSON.stringify(value),
+        result  = await this.gateway.cmd('ZSCORE', key, encoded)
+
+      return result !== null
+    }
+    catch(previousError)
+    {
+      const error = new Error('failed to check if the ordered set has value')
+      error.code  = 'E_REDIS_ORDERED_HAS_VALUE'
+      error.chain = { previousError, key, value }
+      throw error
+    }
+  }
 }
 
 module.exports = RedisServiceOrdered
