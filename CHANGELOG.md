@@ -1,3 +1,6 @@
+2.4.0
+Added the ability to check if an ordered set has a value.
+
 2.3.0
 Added functionality to delete stream item by id.
 
