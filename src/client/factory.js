@@ -40,6 +40,7 @@ class RedisClientFactory
     {
       console.error('redis client error:', error)
       console.error('redis client error discovered, terminating process...')
+      console.error('redis client config...', config)
       process.nextTick(() => process.kill(process.pid, 'SIGKILL'))
     })
 
