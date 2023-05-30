@@ -30,7 +30,7 @@ class RedisServiceHash
 
     try
     {
-      response =  await this.gateway.cmd('HGET', key, field)
+      response = await this.gateway.cmd('HGET', key, field)
     }
     catch(previousError)
     {
@@ -49,6 +49,21 @@ class RedisServiceHash
       const error = new Error('read hash error occured when decoding the response')
       error.code  = 'E_REDIS_HASH_READ'
       error.chain = { previousError, key, response }
+      throw error
+    }
+  }
+
+  async has(key, field)
+  {
+    try
+    {
+      return !!(await this.read(key, field))
+    }
+    catch(previousError)
+    {
+      const error = new Error('hash error occured when looking if a value exists or not')
+      error.code  = 'E_REDIS_HASH_HAS'
+      error.chain = { previousError, key, field }
       throw error
     }
   }
