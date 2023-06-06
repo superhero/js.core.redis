@@ -3,12 +3,13 @@
  */
 class RedisClient
 {
-  constructor(config, console, gateway, factory, connection, hash, key, list, ordered, pubsub, stream, transaction)
+  constructor(config, console, gateway, factory, cluster, connection, hash, key, list, ordered, pubsub, stream, transaction)
   {
     this.config         = config
     this.console        = console
     this.gateway        = gateway
     this.factoryCreate  = factory
+    this.cluster        = cluster
     this.connection     = connection
     this.hash           = hash
     this.key            = key

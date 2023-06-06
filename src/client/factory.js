@@ -3,6 +3,7 @@ const
   process             = require('process'),
   RedisClient         = require('.'),
   RedisClientGateway  = require('./gateway'),
+  RedisCluster        = require('./service/cluster'),
   RedisConnection     = require('./service/connection'),
   RedisHash           = require('./service/hash'),
   RedisKey            = require('./service/key'),
@@ -26,17 +27,18 @@ class RedisClientFactory
     try
     {
       const
-        client        = redis.createClient(config.gateway),
-        gateway       = new RedisClientGateway(client),
-        connection    = new RedisConnection(gateway),
-        hash          = new RedisHash(gateway),
-        key           = new RedisKey(gateway),
-        list          = new RedisList(gateway),
-        ordered       = new RedisOrdered(gateway),
-        pubsub        = new RedisPubsub(gateway),
-        stream        = new RedisStream(gateway, console),
-        factory       = this.create.bind(this, console, config),
-        transaction   = new RedisTransaction(gateway)
+        client      = redis.createClient(config.gateway),
+        gateway     = new RedisClientGateway(client),
+        cluster     = new RedisCluster(gateway),
+        connection  = new RedisConnection(gateway),
+        hash        = new RedisHash(gateway),
+        key         = new RedisKey(gateway),
+        list        = new RedisList(gateway),
+        ordered     = new RedisOrdered(gateway),
+        pubsub      = new RedisPubsub(gateway),
+        stream      = new RedisStream(gateway, console),
+        factory     = this.create.bind(this, console, config),
+        transaction = new RedisTransaction(gateway)
   
       client.on('error', (error) => 
       {
@@ -46,7 +48,7 @@ class RedisClientFactory
         process.nextTick(() => process.kill(process.pid, 'SIGKILL'))
       })
   
-      return new RedisClient(config, console, gateway, factory, connection, hash, key, list, ordered, pubsub, stream, transaction)
+      return new RedisClient(config, console, gateway, factory, cluster, connection, hash, key, list, ordered, pubsub, stream, transaction)
     }
     catch(previousError)
     {
