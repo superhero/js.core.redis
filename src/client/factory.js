@@ -61,7 +61,7 @@ class RedisClientFactory
 
   createClient(config)
   {
-    if(config.cluster.length)
+    if(config.cluster?.length)
     {
       return redis.createCluster(config.cluster)
     }
