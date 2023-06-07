@@ -12,7 +12,8 @@ class RedisServiceCluster
   {
     try
     {
-      return await this.gateway.cmd(`CLUSTER KEYSLOT`, key, label)
+      const hashTag = `${key}{${label}}`
+      return await this.gateway.cmd(`CLUSTER KEYSLOT`, hashTag)
     }
     catch(previousError)
     {
