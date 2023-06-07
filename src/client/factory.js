@@ -27,7 +27,7 @@ class RedisClientFactory
     try
     {
       const
-        client      = redis.createClient(config.gateway),
+        client      = this.createClient(config),
         gateway     = new RedisClientGateway(client),
         cluster     = new RedisCluster(gateway),
         connection  = new RedisConnection(gateway),
@@ -56,6 +56,18 @@ class RedisClientFactory
       error.chain = { previousError, config }
       error.code = 'E_CORE_REDIS_CLIENT_FACTORY_CREATE'
       throw error
+    }
+  }
+
+  createClient(config)
+  {
+    if(config.cluster.length)
+    {
+      return redis.createCluster(config.cluster)
+    }
+    else
+    {
+      return redis.createClient(config.gateway)
     }
   }
 }

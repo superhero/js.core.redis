@@ -22,7 +22,12 @@ module.exports =
       gateway :
       {
         url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`
-      }
+      },
+      cluster :
+      [
+        // { url: 'redis://10.0.0.1:30001' },
+        // { url: 'redis://10.0.0.2:30002' }
+      ]
     }
   }
 }

@@ -1,3 +1,7 @@
+2.5.0
+Added support to connect to a cluster.
+Added new cluster service with keyslot support.
+
 2.4.0
 Added the ability to check if an ordered set has a value.
 
