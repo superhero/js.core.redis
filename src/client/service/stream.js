@@ -15,7 +15,7 @@ class RedisServiceStream
     {
       const error = new Error('can only write a message (msg) of type "object"')
       error.code  = 'E_REDIS_STREAM_WRITE_INVALID_MESSAGE'
-      error.chain = { previousError, stream, msg }
+      error.chain = { stream, msg }
       return reject(error)
     }
 
