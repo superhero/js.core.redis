@@ -24,7 +24,7 @@ class RedisServiceOrdered
     }
   }
 
-  async read(key, min, max, offset=0, count=-1)
+  async read(key, min, max, offset=0, count=-1, reversed=false)
   {
     max = max || min
     min = min || '-inf'
@@ -34,7 +34,9 @@ class RedisServiceOrdered
 
     try
     {
-      response = await this.gateway.cmd('ZRANGEBYSCORE', key, min, max, 'LIMIT', offset, count)
+      response = reversed
+               ? await this.gateway.cmd('ZREVRANGEBYSCORE',  key, min, max, 'LIMIT', offset, count)
+               : await this.gateway.cmd('ZRANGEBYSCORE',     key, min, max, 'LIMIT', offset, count)
     }
     catch(previousError)
     {
