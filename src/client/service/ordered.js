@@ -62,17 +62,16 @@ class RedisServiceOrdered
 
   /**
    * @param {string} key 
-   * @param {boolean} [min=true] if to return the smallest or largest score
+   * @param {boolean} [normal=true] if to return the forward or reversed score
    */
-  async readScore(key, min = true)
+  async readScore(key, normal=true)
   {
     try
     {
-      const 
-        order = min
-          ? ['-inf', '+inf']
-          : ['+inf', '-inf'],
-        response  = await this.gateway.cmd('ZRANGEBYSCORE', key, ...order, 'WITHSCORES', 'LIMIT', 0, 1),
+      const
+        response  = normal
+                  ? await this.gateway.cmd('ZRANGEBYSCORE',     key, '-inf', '+inf', 'WITHSCORES', 'LIMIT', 0, 1)
+                  : await this.gateway.cmd('ZREVRANGEBYSCORE',  key, '-inf', '+inf', 'WITHSCORES', 'LIMIT', 0, 1),
         score     = !!response.length && Number(response.pop())
 
       return score
