@@ -35,8 +35,8 @@ class RedisServiceOrdered
     try
     {
       response = reversed
-               ? await this.gateway.cmd('ZREVRANGEBYSCORE',  key, min, max, 'LIMIT', offset, count)
-               : await this.gateway.cmd('ZRANGEBYSCORE',     key, min, max, 'LIMIT', offset, count)
+               ? await this.gateway.cmd('ZREVRANGEBYSCORE',  key, min || '+inf', max || '-inf', 'LIMIT', offset, count)
+               : await this.gateway.cmd('ZRANGEBYSCORE',     key, min || '-inf', max || '+inf', 'LIMIT', offset, count)
     }
     catch(previousError)
     {
@@ -71,7 +71,7 @@ class RedisServiceOrdered
       const
         response  = normal
                   ? await this.gateway.cmd('ZRANGEBYSCORE',     key, '-inf', '+inf', 'WITHSCORES', 'LIMIT', 0, 1)
-                  : await this.gateway.cmd('ZREVRANGEBYSCORE',  key, '-inf', '+inf', 'WITHSCORES', 'LIMIT', 0, 1),
+                  : await this.gateway.cmd('ZREVRANGEBYSCORE',  key, '+inf', '-inf', 'WITHSCORES', 'LIMIT', 0, 1),
         score     = !!response.length && Number(response.pop())
 
       return score
