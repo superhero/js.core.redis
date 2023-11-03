@@ -8,6 +8,21 @@ class RedisServiceKey
     this.gateway = gateway
   }
 
+  async exists(key)
+  {
+    try
+    {
+      return await this.gateway.cmd('EXISTS', key)
+    }
+    catch(previousError)
+    {
+      const error = new Error('see if key exists failed')
+      error.code  = 'E_REDIS_KEY_EXISTS'
+      error.chain = { previousError, key }
+      throw error
+    }
+  }
+
   async write(key, value)
   {
     try
