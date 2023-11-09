@@ -68,6 +68,20 @@ class RedisServiceKey
     }
   }
 
+  async * scan(pattern)
+  {
+    let keys, cursor = 0
+    do
+    {
+      [cursor, keys] = await this.gateway.cmd('SCAN ' + cursor + ' MATCH ' + pattern + ' COUNT 100')
+      for(const key of keys)
+      {
+        yield key
+      }
+    }
+    while(cursor !== '0')
+  }
+
   async increment(key, i = 1)
   {
     try
