@@ -73,7 +73,7 @@ class RedisServiceKey
     let keys, cursor = 0
     do
     {
-      [cursor, keys] = await this.gateway.cmd('SCAN ' + cursor + ' MATCH ' + pattern + ' COUNT 100')
+      [cursor, keys] = await this.gateway.cmd('SCAN', cursor, 'MATCH', pattern, 'COUNT', '100')
       for(const key of keys)
       {
         yield key
