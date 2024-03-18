@@ -57,7 +57,7 @@ class RedisServiceKey
 
     try
     {
-      return JSON.parse(response)
+      return response === 'undefined' ? undefined : JSON.parse(response)
     }
     catch(previousError)
     {

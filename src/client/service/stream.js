@@ -78,7 +78,7 @@ class RedisServiceStream
         {
           const
             key = dto[i-1],
-            val = JSON.parse(dto[i])
+            val = dto[i] === 'undefined' ? undefined : JSON.parse(dto[i])
 
           msg[key] = val
         }
@@ -174,7 +174,7 @@ class RedisServiceStream
         {
           const
             key = dto[i-1],
-            val = JSON.parse(dto[i])
+            val = dto[i] === 'undefined' ? undefined : JSON.parse(dto[i])
 
           msg[key] = val
         }

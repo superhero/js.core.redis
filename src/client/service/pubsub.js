@@ -39,7 +39,7 @@ class RedisServicePubsub
     {
       await this.gateway.redis.pSubscribe(channel, (msg, noPatternChannel) => 
       {
-        const dto = JSON.parse(msg)
+        const dto = msg === 'undefined' ? undefined : JSON.parse(msg)
         observer(dto, channel, noPatternChannel)
       })
     }

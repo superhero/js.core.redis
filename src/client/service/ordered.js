@@ -48,7 +48,7 @@ class RedisServiceOrdered
 
     try
     {
-      const decoded = response.map((item) => JSON.parse(item))
+      const decoded = response.map((item) => item === 'undefined' ? undefined : JSON.parse(item))
       return decoded
     }
     catch(previousError)

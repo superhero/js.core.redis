@@ -42,7 +42,7 @@ class RedisServiceHash
 
     try
     {
-      return JSON.parse(response)
+      return response === 'undefined' ? undefined : JSON.parse(response)
     }
     catch(previousError)
     {
@@ -137,7 +137,7 @@ class RedisServiceHash
       {
         const
           key = response[i-1],
-          val = JSON.parse(response[i])
+          val = response[i] === 'undefined' ? undefined : JSON.parse(response[i])
 
         output[key] = val
       }

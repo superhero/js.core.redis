@@ -33,7 +33,7 @@ class RedisServiceList
 
     try
     {
-      return response && response.map((item) => JSON.parse(item))
+      return response && response.map((item) => item === 'undefined' ? undefined : JSON.parse(item))
     }
     catch(previousError)
     {
@@ -93,7 +93,7 @@ class RedisServiceList
 
     try
     {
-      return JSON.parse(response)
+      return response === 'undefined' ? undefined : JSON.parse(response)
     }
     catch(previousError)
     {
@@ -138,7 +138,7 @@ class RedisServiceList
 
     try
     {
-      return JSON.parse(response)
+      return response === 'undefined' ? undefined : JSON.parse(response)
     }
     catch(previousError)
     {
