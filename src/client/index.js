@@ -3,7 +3,7 @@
  */
 class RedisClient
 {
-  constructor(config, console, gateway, factory, cluster, connection, hash, key, list, ordered, pubsub, stream, transaction)
+  constructor(config, console, gateway, factory, cluster, connection, hash, key, list, ordered, pubsub, stream, transaction, unordered)
   {
     this.config         = config
     this.console        = console
@@ -15,6 +15,7 @@ class RedisClient
     this.key            = key
     this.list           = list
     this.ordered        = ordered
+    this.unordered      = unordered
     this.pubsub         = pubsub
     this.stream         = stream
     this.transaction    = transaction

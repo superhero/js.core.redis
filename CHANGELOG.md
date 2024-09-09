@@ -1,3 +1,6 @@
+2.7.0
+Added support for unordered list (SET).
+
 2.5.0
 Added support to connect to a cluster.
 Added new cluster service with keyslot support.

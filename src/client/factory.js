@@ -9,6 +9,7 @@ const
   RedisKey            = require('./service/key'),
   RedisList           = require('./service/list'),
   RedisOrdered        = require('./service/ordered'),
+  RedisUnordered      = require('./service/unordered'),
   RedisPubsub         = require('./service/pubsub'),
   RedisStream         = require('./service/stream'),
   RedisTransaction    = require('./service/transaction')
@@ -35,6 +36,7 @@ class RedisClientFactory
         key         = new RedisKey(gateway),
         list        = new RedisList(gateway),
         ordered     = new RedisOrdered(gateway),
+        unordered   = new RedisUnordered(gateway),
         pubsub      = new RedisPubsub(gateway),
         stream      = new RedisStream(gateway, console),
         factory     = this.create.bind(this, console, config),
@@ -48,7 +50,7 @@ class RedisClientFactory
         process.nextTick(() => process.kill(process.pid, 'SIGKILL'))
       })
   
-      return new RedisClient(config, console, gateway, factory, cluster, connection, hash, key, list, ordered, pubsub, stream, transaction)
+      return new RedisClient(config, console, gateway, factory, cluster, connection, hash, key, list, ordered, pubsub, stream, transaction, unordered)
     }
     catch(previousError)
     {
