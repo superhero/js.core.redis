@@ -21,7 +21,8 @@ module.exports =
       auth    : process.env.REDIS_AUTH,
       gateway :
       {
-        url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`
+        url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
+        reconnectStrategy: retries => Math.min(retries * 100, 2000),
       },
       cluster :
       [

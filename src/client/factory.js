@@ -45,9 +45,12 @@ class RedisClientFactory
       client.on('error', (error) => 
       {
         console.error('redis client error:', error)
-        console.error('redis client error discovered, terminating process...')
-        console.error('redis client config...', config)
-        process.nextTick(() => process.kill(process.pid, 'SIGKILL'))
+        if('SocketClosedUnexpectedlyError' !== error.name)
+        {
+          console.error('redis client error discovered, terminating process...')
+          console.error('redis client config...', config)
+          process.nextTick(() => process.kill(process.pid, 'SIGKILL'))
+        }
       })
   
       return new RedisClient(config, console, gateway, factory, cluster, connection, hash, key, list, ordered, pubsub, stream, transaction, unordered)
